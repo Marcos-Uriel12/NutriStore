@@ -1,0 +1,448 @@
+/* ═══════════════════════════════════════════════════════════════════
+   NutriStore — Tema Natural
+   Paleta: verde hoja, blanco roto, beige madera
+   ═══════════════════════════════════════════════════════════════════ */
+
+:root {
+  --color-primary: #4a7c59;
+  --color-primary-dark: #3d6349;
+  --color-bg: #faf7f2;
+  --color-accent: #d4c5a9;
+  --color-text: #2c3e2d;
+  --color-text-muted: #6b7c6d;
+  --color-white: #ffffff;
+  --color-danger: #c0392b;
+  --color-success: #27ae60;
+  --color-navbar-bg: #ffffff;
+  --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.08);
+  --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.1);
+  --radius: 12px;
+  --transition: 0.2s ease;
+}
+
+/* ── Base ────────────────────────────────────────────────────────── */
+
+body {
+  background-color: var(--color-bg);
+  color: var(--color-text);
+  font-family: "Segoe UI", system-ui, -apple-system, sans-serif;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+/* ── Navbar ──────────────────────────────────────────────────────── */
+
+.navbar {
+  background-color: var(--color-navbar-bg) !important;
+  box-shadow: var(--shadow-sm);
+  padding: 0.5rem 1rem;
+}
+
+.navbar.sticky-top {
+  z-index: 1030;
+}
+
+.navbar-brand {
+  color: var(--color-primary) !important;
+  font-weight: 700;
+  font-size: 1.4rem;
+  letter-spacing: -0.5px;
+}
+
+.navbar-brand:hover {
+  color: var(--color-primary-dark) !important;
+}
+
+.navbar-nav .nav-link {
+  color: var(--color-text) !important;
+  font-weight: 500;
+  transition: color var(--transition);
+}
+
+.navbar-nav .nav-link:hover,
+.navbar-nav .nav-link.active {
+  color: var(--color-primary) !important;
+}
+
+/* Cart badge */
+.cart-badge {
+  background-color: var(--color-primary);
+  color: var(--color-white);
+  border-radius: 50%;
+  padding: 0.15em 0.45em;
+  font-size: 0.7rem;
+  position: relative;
+  top: -0.5em;
+  left: -0.2em;
+}
+
+/* ── Navbar admin override ───────────────────────────────────────── */
+
+.admin-navbar {
+  background-color: var(--color-primary-dark) !important;
+}
+
+.admin-navbar .navbar-brand,
+.admin-navbar .navbar-nav .nav-link {
+  color: var(--color-white) !important;
+}
+
+.admin-navbar .navbar-nav .nav-link:hover {
+  opacity: 0.85;
+}
+
+/* ── Hero ────────────────────────────────────────────────────────── */
+
+.hero {
+  position: relative;
+  height: 80vh;
+  min-height: 480px;
+  background-size: cover;
+  background-position: center;
+  background-image: url("/img/local_exterior.png");
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.hero::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(135deg, rgba(61, 99, 73, 0.75) 0%, rgba(44, 62, 45, 0.55) 100%);
+}
+
+.hero-content {
+  position: relative;
+  z-index: 1;
+  text-align: center;
+  color: var(--color-white);
+  padding: 1rem;
+}
+
+.hero-content h1 {
+  font-size: clamp(2rem, 5vw, 3.5rem);
+  font-weight: 800;
+  margin-bottom: 0.5rem;
+  letter-spacing: -1px;
+}
+
+.hero-content p {
+  font-size: clamp(1rem, 2.5vw, 1.4rem);
+  font-weight: 300;
+  opacity: 0.9;
+}
+
+.hero-content .btn {
+  margin-top: 1.5rem;
+  padding: 0.75rem 2rem;
+  font-size: 1.1rem;
+}
+
+/* ── Sections ────────────────────────────────────────────────────── */
+
+.section {
+  padding: 4rem 0;
+}
+
+.section-title {
+  color: var(--color-primary-dark);
+  font-weight: 700;
+  margin-bottom: 2rem;
+  position: relative;
+}
+
+.section-title::after {
+  content: "";
+  display: block;
+  width: 60px;
+  height: 3px;
+  background-color: var(--color-accent);
+  margin-top: 0.5rem;
+}
+
+/* Quiénes Somos */
+.about-img {
+  border-radius: var(--radius);
+  max-width: 100%;
+  height: auto;
+  box-shadow: var(--shadow-md);
+}
+
+.about-text {
+  color: var(--color-text);
+  font-size: 1.05rem;
+  line-height: 1.75;
+}
+
+/* ── Product Cards ───────────────────────────────────────────────── */
+
+.product-card {
+  border: 1px solid rgba(212, 197, 169, 0.4);
+  border-radius: var(--radius);
+  overflow: hidden;
+  transition: transform var(--transition), box-shadow var(--transition);
+  background-color: var(--color-white);
+}
+
+.product-card:hover {
+  transform: translateY(-4px);
+  box-shadow: var(--shadow-md);
+}
+
+.product-card .card-img-top {
+  height: 180px;
+  object-fit: cover;
+  background-color: var(--color-bg);
+}
+
+.product-card .card-body {
+  padding: 1rem;
+}
+
+.product-card .card-title {
+  color: var(--color-text);
+  font-weight: 600;
+  font-size: 0.95rem;
+  margin-bottom: 0.25rem;
+}
+
+.product-card .card-text {
+  color: var(--color-text-muted);
+  font-size: 0.85rem;
+  margin-bottom: 0.75rem;
+}
+
+/* ── Buttons ─────────────────────────────────────────────────────── */
+
+.btn-primary {
+  background-color: var(--color-primary) !important;
+  border-color: var(--color-primary) !important;
+  color: var(--color-white) !important;
+  font-weight: 500;
+  transition: background-color var(--transition);
+}
+
+.btn-primary:hover,
+.btn-primary:focus {
+  background-color: var(--color-primary-dark) !important;
+  border-color: var(--color-primary-dark) !important;
+}
+
+.btn-outline-primary {
+  color: var(--color-primary) !important;
+  border-color: var(--color-primary) !important;
+  background-color: transparent !important;
+}
+
+.btn-outline-primary:hover {
+  color: var(--color-white) !important;
+  background-color: var(--color-primary) !important;
+}
+
+.btn-danger {
+  background-color: var(--color-danger) !important;
+  border-color: var(--color-danger) !important;
+}
+
+.btn-success {
+  background-color: var(--color-success) !important;
+  border-color: var(--color-success) !important;
+}
+
+/* ── Footer ──────────────────────────────────────────────────────── */
+
+.footer {
+  background-color: var(--color-primary-dark);
+  color: var(--color-white);
+  padding: 3rem 0 1.5rem;
+  margin-top: auto;
+}
+
+.footer h6 {
+  color: var(--color-accent);
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  font-size: 0.85rem;
+  margin-bottom: 1rem;
+}
+
+.footer a {
+  color: var(--color-white);
+  text-decoration: none;
+  opacity: 0.85;
+  transition: opacity var(--transition);
+}
+
+.footer a:hover {
+  opacity: 1;
+  color: var(--color-accent);
+}
+
+.footer .copyright {
+  border-top: 1px solid rgba(255, 255, 255, 0.15);
+  margin-top: 2rem;
+  padding-top: 1rem;
+  font-size: 0.85rem;
+  opacity: 0.7;
+  text-align: center;
+}
+
+/* ── Forms ───────────────────────────────────────────────────────── */
+
+.form-control:focus {
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 0.2rem rgba(74, 124, 89, 0.15);
+}
+
+.form-label {
+  color: var(--color-text);
+  font-weight: 500;
+  font-size: 0.9rem;
+}
+
+/* ── Admin: Tables ───────────────────────────────────────────────── */
+
+.table thead th {
+  background-color: var(--color-bg);
+  color: var(--color-text);
+  font-weight: 600;
+  font-size: 0.85rem;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  border-bottom: 2px solid var(--color-accent);
+}
+
+.table-striped > tbody > tr:nth-of-type(odd) > * {
+  background-color: rgba(250, 247, 242, 0.5);
+}
+
+.table td {
+  vertical-align: middle;
+}
+
+/* ── Admin: Tabs ─────────────────────────────────────────────────── */
+
+.nav-tabs .nav-link {
+  color: var(--color-text-muted);
+  font-weight: 500;
+  border: none;
+  padding: 0.6rem 1.25rem;
+}
+
+.nav-tabs .nav-link.active {
+  color: var(--color-primary) !important;
+  border-bottom: 3px solid var(--color-primary);
+  background: transparent;
+}
+
+.nav-tabs .nav-link:hover:not(.active) {
+  color: var(--color-primary);
+  border-bottom-color: var(--color-accent);
+}
+
+/* ── Admin: Modals ───────────────────────────────────────────────── */
+
+.modal-content {
+  border-radius: var(--radius);
+  border: none;
+}
+
+.modal-header {
+  background-color: var(--color-bg);
+  border-bottom: 1px solid var(--color-accent);
+  border-radius: var(--radius) var(--radius) 0 0;
+}
+
+/* ── Order Timeline ──────────────────────────────────────────────── */
+
+.timeline-step {
+  flex: 1;
+  text-align: center;
+  font-size: 0.8rem;
+}
+
+.timeline-step.complete {
+  color: var(--color-success);
+}
+
+.timeline-step.current {
+  color: var(--color-primary);
+  font-weight: 600;
+}
+
+.timeline-step.pending {
+  color: var(--color-text-muted);
+}
+
+.timeline-step.cancelled {
+  color: var(--color-danger);
+}
+
+/* ── Login Page ──────────────────────────────────────────────────── */
+
+.login-card {
+  border: none;
+  border-radius: var(--radius);
+}
+
+.login-card .card-body {
+  padding: 2.5rem;
+}
+
+.login-card h3 {
+  color: var(--color-primary);
+  font-weight: 700;
+}
+
+/* ── Responsive Tweaks ───────────────────────────────────────────── */
+
+@media (max-width: 767.98px) {
+  .hero {
+    height: 60vh;
+    min-height: 360px;
+  }
+
+  .section {
+    padding: 2.5rem 0;
+  }
+
+  .footer {
+    text-align: center;
+  }
+
+  .footer .col-md-4 {
+    margin-bottom: 1.5rem;
+  }
+}
+
+/* ── Empty States ────────────────────────────────────────────────── */
+
+.empty-state {
+  text-align: center;
+  padding: 3rem 1rem;
+  color: var(--color-text-muted);
+}
+
+.empty-state .bi {
+  font-size: 3rem;
+  margin-bottom: 1rem;
+}
+
+/* ── Toast / Alert ───────────────────────────────────────────────── */
+
+.alert {
+  border-radius: var(--radius);
+}
+
+.toast-success {
+  background-color: var(--color-success);
+  color: var(--color-white);
+}
+
+.toast-error {
+  background-color: var(--color-danger);
+  color: var(--color-white);
+}
