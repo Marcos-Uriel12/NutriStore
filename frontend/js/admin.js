@@ -30,7 +30,7 @@ const admin = {
   /* ── Auth ──────────────────────────────────────────────────────── */
 
   async login(email, password) {
-    const res = await fetch("/auth/login", {
+    const res = await apiFetch("/auth/login", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ email, password }),
@@ -52,13 +52,7 @@ const admin = {
   /* ── Auth-aware Fetch ──────────────────────────────────────────── */
 
   async fetch(url, options = {}) {
-    const headers = { ...(options.headers || {}) };
-    const token = this.getToken();
-    if (token) {
-      headers["Authorization"] = `Bearer ${token}`;
-    }
-
-    const res = await fetch(url, { ...options, headers });
+    const res = await apiFetch(url, options);
 
     if (res.status === 401) {
       this.clearToken();
