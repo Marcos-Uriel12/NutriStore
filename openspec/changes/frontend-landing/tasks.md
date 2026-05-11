@@ -33,18 +33,18 @@ Chain strategy: feature-branch-chain
 
 ## Phase 2: CSS + JS Infrastructure
 
-- [ ] 2.1 `css/style.css` — Theme: custom properties, button/card/navbar/footer/hero
-- [ ] 2.2 `js/app.js` — Session ID UUID, X-Session-ID header, HTMX config
-- [ ] 2.3 `js/cart.js` — Cart fetch API: add/update/remove/get/checkout
-- [ ] 2.4 `js/admin.js` — JWT localStorage, auth header, login/logout/guard
+- [x] 2.1 `css/style.css` — Theme: custom properties, button/card/navbar/footer/hero
+- [x] 2.2 `js/app.js` — Session ID UUID, X-Session-ID header, HTMX config
+- [x] 2.3 `js/cart.js` — Cart fetch API: add/update/remove/get/checkout
+- [x] 2.4 `js/admin.js` — JWT localStorage, auth header, login/logout/guard
 
 ## Phase 3: Frontend Pages
 
-- [ ] 3.1 `index.html` — Navbar, hero, quiénes somos 2-col, product infinite scroll, footer
-- [ ] 3.2 `carrito.html` — Cart table, modify/remove, checkout form with conditional fields
-- [ ] 3.3 `pedido.html` — Code input, pre-fill from URL, order details + timeline
-- [ ] 3.4 `admin/login.html` — Login form, POST /auth/login, store JWT, redirect
-- [ ] 3.5 `admin/dashboard.html` — Auth guard, tabs (productos/categorías/pedidos), CRUD modals
+- [x] 3.1 `index.html` — Navbar, hero, quiénes somos 2-col, product infinite scroll, footer
+- [x] 3.2 `carrito.html` — Cart table, modify/remove, checkout form with conditional fields
+- [x] 3.3 `pedido.html` — Code input, pre-fill from URL, order details + timeline
+- [x] 3.4 `admin/login.html` — Login form, POST /auth/login, store JWT, redirect
+- [x] 3.5 `admin/dashboard.html` — Auth guard, tabs (productos/categorías/pedidos), CRUD modals
 
 ## Phase 4: Verification
 
