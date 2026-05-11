@@ -1,4 +1,4 @@
-from fastapi import Depends, HTTPException, status
+from fastapi import Depends, HTTPException, Request, status
 from fastapi.security import OAuth2PasswordBearer
 from jose import JWTError, jwt
 from redis.asyncio import Redis
@@ -36,10 +36,6 @@ async def get_current_admin(
     return admin
 
 
-async def get_redis():
-    """Yield a Redis connection. Will be lifespan-managed in PR #3."""
-    redis = Redis.from_url(settings.REDIS_URL, decode_responses=True)
-    try:
-        yield redis
-    finally:
-        await redis.close()
+async def get_redis(request: Request) -> Redis:
+    """Return the lifespan-managed Redis client from app.state."""
+    return request.app.state.redis
