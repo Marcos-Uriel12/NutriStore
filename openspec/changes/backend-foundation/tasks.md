@@ -57,12 +57,12 @@ Chain strategy: feature-branch-chain
 
 ## PR #2: Auth + CRUD (High-level)
 
-- [ ] 4.1 Create `app/dependencies.py` (JWT guard, get_redis)
-- [ ] 4.2 Create `app/usuarios/` (router, schemas, service) — login + me
-- [ ] 4.3 Create `app/productos/` — categorias + productos + imágenes
-- [ ] 4.4 Create `app/main.py` (app, lifespan, routers, seeder)
-- [ ] 4.5 Create `scripts/seed.py`
-- [ ] 4.6 Write tests: test_auth.py, test_productos.py
+- [x] 4.1 Create `app/dependencies.py` (JWT guard, get_redis)
+- [x] 4.2 Create `app/usuarios/` (router, schemas, service) — login + me
+- [x] 4.3 Create `app/productos/` — categorias + productos + imágenes
+- [x] 4.4 Create `app/main.py` (app, lifespan, routers, seeder)
+- [x] 4.5 Create `scripts/seed.py`
+- [x] 4.6 Write tests: test_auth.py, test_productos.py
 
 ## PR #3: Cart + Orders + Shipping (High-level)
 
