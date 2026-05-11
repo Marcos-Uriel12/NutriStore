@@ -117,18 +117,22 @@
         <table class="table table-striped">
           <thead>
             <tr>
-              <th>ID</th>
+              <th>#</th>
               <th>Cliente</th>
               <th>Total</th>
-              <th>Tipo</th>
+              <th>Entrega</th>
+              <th>Productos</th>
+              <th>Pago</th>
               <th>Estado</th>
               <th>Fecha</th>
-              <th>Acción</th>
+              <th></th>
             </tr>
           </thead>
           <tbody id="pedidos-tbody">
-            <tr><td colspan="7" class="text-center py-4">
-              <div class="spinner-border text-success" role="status"></div>
+            <tr><td colspan="9" class="text-center py-4">
+              <div class="spinner-border text-success" role="status">
+                <span class="visually-hidden">Cargando pedidos...</span>
+              </div>
             </td></tr>
           </tbody>
         </table>
@@ -564,7 +568,7 @@
 
         if (pedidos.length === 0) {
           tbody.innerHTML =
-            '<tr><td colspan="7" class="text-center text-muted py-4">No hay pedidos.</td></tr>';
+            '<tr><td colspan="9" class="text-center text-muted py-4">No hay pedidos.</td></tr>';
           return;
         }
 
@@ -581,12 +585,31 @@
                 })
               : "—";
 
+            const itemsHtml = p.items && p.items.length > 0
+              ? p.items.map(i => {
+                  const cant = i.unidad_medida === 'KG' ? `${i.cantidad * 1000}g` : `${i.cantidad} u`;
+                  return `<div class="small">${i.producto_nombre || `#${i.producto_id}`} × ${cant} — $${parseFloat(i.precio_unitario).toFixed(2)}</div>`;
+                }).join('')
+              : '<span class="text-muted small">Sin items</span>';
+
+            const pagoHtml = p.pago
+              ? `<span class="badge bg-info">${p.pago.metodo}</span>`
+              : '<span class="text-muted small">—</span>';
+
+            const clienteHtml = `
+              <strong>${p.cliente_nombre}</strong><br>
+              <small class="text-muted">${p.cliente_telefono}</small>
+              ${p.tipo_entrega === 'ENVIO' ? `<br><small>${p.zona_envio || ''}</small>` : ''}
+            `;
+
             return `
             <tr>
               <td>#${p.id}</td>
-              <td>${p.cliente_nombre}</td>
+              <td>${clienteHtml}</td>
               <td>$${parseFloat(p.total || 0).toFixed(2)}</td>
               <td>${tipoLabel}</td>
+              <td>${itemsHtml}</td>
+              <td>${pagoHtml}</td>
               <td>
                 <select class="form-select form-select-sm estado-select"
                         data-pedido-id="${p.id}"
@@ -623,7 +646,7 @@
           });
         });
       } catch (err) {
-        tbody.innerHTML = `<tr><td colspan="7" class="text-center text-danger py-4">Error: ${err.message}</td></tr>`;
+        tbody.innerHTML = `<tr><td colspan="9" class="text-center text-danger py-4">Error: ${err.message}</td></tr>`;
       }
     }
 

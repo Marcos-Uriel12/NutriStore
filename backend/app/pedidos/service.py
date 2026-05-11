@@ -4,6 +4,7 @@ from decimal import Decimal
 from fastapi import HTTPException, status
 from redis.asyncio import Redis
 from sqlalchemy import select
+from sqlalchemy.orm import selectinload
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.models.envio import EnvioConfig
@@ -179,7 +180,14 @@ async def list_pedidos(
     session_id: str | None = None,
 ) -> list[Pedido]:
     """List orders: admin sees all, anonymous sees own."""
-    stmt = select(Pedido).order_by(Pedido.created_at.desc())
+    stmt = (
+        select(Pedido)
+        .options(
+            selectinload(Pedido.items).selectinload(PedidoItem.producto),
+            selectinload(Pedido.pago),
+        )
+        .order_by(Pedido.created_at.desc())
+    )
     if session_id:
         stmt = stmt.where(Pedido.session_id == session_id)
     result = await db.execute(stmt)
@@ -187,7 +195,14 @@ async def list_pedidos(
 
 
 async def get_pedido(db: AsyncSession, pedido_id: int) -> Pedido | None:
-    result = await db.execute(select(Pedido).where(Pedido.id == pedido_id))
+    result = await db.execute(
+        select(Pedido)
+        .options(
+            selectinload(Pedido.items).selectinload(PedidoItem.producto),
+            selectinload(Pedido.pago),
+        )
+        .where(Pedido.id == pedido_id)
+    )
     return result.scalar_one_or_none()
 
 

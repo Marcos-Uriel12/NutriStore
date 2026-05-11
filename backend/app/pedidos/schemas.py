@@ -1,7 +1,7 @@
 import datetime
 from decimal import Decimal
 
-from pydantic import BaseModel
+from pydantic import BaseModel, model_validator
 
 from app.models.pago import MetodoPago, EstadoPago
 from app.models.pedido import EstadoPedido, TipoEntrega, ZonaEnvio
@@ -21,11 +21,26 @@ class PedidoCreate(BaseModel):
 class PedidoItemResponse(BaseModel):
     id: int
     producto_id: int
+    producto_nombre: str = ""
     cantidad: float
     unidad_medida: UnidadMedida
     precio_unitario: Decimal
 
     model_config = {"from_attributes": True}
+
+    @model_validator(mode="before")
+    @classmethod
+    def _fill_producto_nombre(cls, data):
+        if isinstance(data, dict):
+            return data
+        # data is a PedidoItem ORM instance
+        try:
+            producto = getattr(data, "producto", None)
+            if producto is not None:
+                data.producto_nombre = producto.nombre
+        except Exception:
+            pass
+        return data
 
 
 class PagoResponse(BaseModel):
