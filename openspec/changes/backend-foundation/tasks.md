@@ -28,41 +28,41 @@ Chain strategy: feature-branch-chain
 
 ### Phase 1: Foundation
 
-- [ ] 1.1 Create `docker-compose.yml` (PostgreSQL 16 + Redis 7)
-- [ ] 1.2 Create `Dockerfile` (Python 3.12-slim, uv)
-- [ ] 1.3 Create `pyproject.toml` with all deps (fastapi, sqlalchemy, asyncpg, redis, alembic, jose, passlib, pytest, httpx, fakeredis, aiosqlite)
-- [ ] 1.4 Create `app/__init__.py`
-- [ ] 1.5 Create `app/config.py` (Pydantic Settings)
-- [ ] 1.6 Create `app/database.py` (async_engine, sessionmaker, get_db)
+- [x] 1.1 Create `docker-compose.yml` (PostgreSQL 16 + Redis 7)
+- [x] 1.2 Create `Dockerfile` (Python 3.12-slim, uv)
+- [x] 1.3 Create `pyproject.toml` with all deps (fastapi, sqlalchemy, asyncpg, redis, alembic, jose, passlib, pytest, httpx, fakeredis, aiosqlite)
+- [x] 1.4 Create `app/__init__.py`
+- [x] 1.5 Create `app/config.py` (Pydantic Settings)
+- [x] 1.6 Create `app/database.py` (async_engine, sessionmaker, get_db)
 
 ### Phase 2: Models + Alembic
 
-- [ ] 2.1 Create `app/models/__init__.py`
-- [ ] 2.2 Create `app/models/admin.py` (Admin)
-- [ ] 2.3 Create `app/models/categoria.py` (Categoria)
-- [ ] 2.4 Create `app/models/producto.py` (Producto, TipoUnidad enum)
-- [ ] 2.5 Create `app/models/imagen.py` (Imagen)
-- [ ] 2.6 Create `app/models/pedido.py` (Pedido, estado enum)
-- [ ] 2.7 Create `app/models/pedido_item.py` (PedidoItem)
-- [ ] 2.8 Create `app/models/pago.py` (Pago)
-- [ ] 2.9 Create `app/models/envio.py` (EnvioConfig, zonas JSON)
-- [ ] 2.10 Create `alembic.ini` + `alembic/env.py`
-- [ ] 2.11 Run `alembic revision --autogenerate` → first migration
+- [x] 2.1 Create `app/models/__init__.py`
+- [x] 2.2 Create `app/models/admin.py` (Admin)
+- [x] 2.3 Create `app/models/categoria.py` (Categoria)
+- [x] 2.4 Create `app/models/producto.py` (Producto, TipoUnidad enum)
+- [x] 2.5 Create `app/models/imagen.py` (Imagen)
+- [x] 2.6 Create `app/models/pedido.py` (Pedido, estado enum)
+- [x] 2.7 Create `app/models/pedido_item.py` (PedidoItem)
+- [x] 2.8 Create `app/models/pago.py` (Pago)
+- [x] 2.9 Create `app/models/envio.py` (EnvioConfig, zonas JSON)
+- [x] 2.10 Create `alembic.ini` + `alembic/env.py`
+- [x] 2.11 Run `alembic revision --autogenerate` → first migration
 
 ### Phase 3: Model Tests
 
-- [ ] 3.1 Create `tests/conftest.py` (async SQLite, TestClient, fixtures)
-- [ ] 3.2 Write model tests: Admin hash, TipoUnidad enum, Pedido state defaults
-- [ ] 3.3 Verify `alembic upgrade head` creates all tables
+- [x] 3.1 Create `tests/conftest.py` (async SQLite, TestClient, fixtures)
+- [x] 3.2 Write model tests: Admin hash, TipoUnidad enum, Pedido state defaults
+- [x] 3.3 Verify `alembic upgrade head` creates all tables
 
 ## PR #2: Auth + CRUD (High-level)
 
-- [ ] 4.1 Create `app/dependencies.py` (JWT guard, get_redis)
-- [ ] 4.2 Create `app/usuarios/` (router, schemas, service) — login + me
-- [ ] 4.3 Create `app/productos/` — categorias + productos + imágenes
-- [ ] 4.4 Create `app/main.py` (app, lifespan, routers, seeder)
-- [ ] 4.5 Create `scripts/seed.py`
-- [ ] 4.6 Write tests: test_auth.py, test_productos.py
+- [x] 4.1 Create `app/dependencies.py` (JWT guard, get_redis)
+- [x] 4.2 Create `app/usuarios/` (router, schemas, service) — login + me
+- [x] 4.3 Create `app/productos/` — categorias + productos + imágenes
+- [x] 4.4 Create `app/main.py` (app, lifespan, routers, seeder)
+- [x] 4.5 Create `scripts/seed.py`
+- [x] 4.6 Write tests: test_auth.py, test_productos.py
 
 ## PR #3: Cart + Orders + Shipping (High-level)
 
