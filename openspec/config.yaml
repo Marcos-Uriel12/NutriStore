@@ -1,0 +1,34 @@
+# openspec/config.yaml
+schema: spec-driven
+
+context: |
+  Tech stack: Python 3.12, FastAPI, SQLAlchemy, PostgreSQL + Redis in Docker, uv
+  Architecture: RESTful API, domain-organized backend
+  Testing: pytest in backend/tests/, organized by domain (test_usuarios.py, test_productos.py, etc.)
+  Style: Python typing, async with FastAPI, domain-driven test organization
+
+rules:
+  proposal:
+    - Keep scope focused on the change described
+    - Include rollback plan for risky changes
+  specs:
+    - Use Given/When/Then for scenarios
+    - Use RFC 2119 keywords (MUST, SHALL, SHOULD, MAY)
+  design:
+    - Include sequence diagrams for complex flows
+    - Document architecture decisions with rationale
+  tasks:
+    - Group by phase, use hierarchical numbering
+    - Keep tasks completable in one session
+  apply:
+    - Follow existing code patterns
+    tdd: false
+    test_command: "uv run pytest"
+  verify:
+    test_command: "uv run pytest"
+    build_command: "uv sync"
+    coverage_threshold: 0
+  archive:
+    - Warn before merging destructive deltas
+
+strict_tdd: false
