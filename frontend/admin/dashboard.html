@@ -1,0 +1,663 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Admin Dashboard — NutriStore</title>
+
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet"
+        integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous" />
+  <link href="/css/style.css" rel="stylesheet" />
+  <script src="https://unpkg.com/htmx.org@2.0.4"></script>
+</head>
+<body>
+
+  <!-- Admin Navbar -->
+  <nav class="navbar navbar-expand-lg sticky-top admin-navbar">
+    <div class="container-fluid">
+      <a class="navbar-brand" href="#">🌿 NutriStore Admin</a>
+      <div class="ms-auto">
+        <span class="navbar-text text-white-50 me-3" id="admin-label">Dashboard</span>
+        <button class="btn btn-outline-light btn-sm" onclick="admin.logout()">
+          Cerrar Sesión
+        </button>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Dashboard Content -->
+  <div class="container-fluid py-4">
+    <h2 class="mb-4">Panel de Administración</h2>
+
+    <!-- Tabs -->
+    <ul class="nav nav-tabs mb-4" id="adminTabs" role="tablist">
+      <li class="nav-item" role="presentation">
+        <button class="nav-link active" data-tab="productos" type="button">
+          Productos
+        </button>
+      </li>
+      <li class="nav-item" role="presentation">
+        <button class="nav-link" data-tab="categorias" type="button">
+          Categorías
+        </button>
+      </li>
+      <li class="nav-item" role="presentation">
+        <button class="nav-link" data-tab="pedidos" type="button">
+          Pedidos
+        </button>
+      </li>
+      <li class="nav-item" role="presentation">
+        <button class="nav-link" data-tab="envios" type="button">
+          Envíos
+        </button>
+      </li>
+    </ul>
+
+    <!-- ═══════════ PRODUCTOS TAB ═══════════ -->
+    <div id="tab-productos" class="tab-content">
+      <div class="d-flex justify-content-between align-items-center mb-3">
+        <h5>Gestión de Productos</h5>
+        <button class="btn btn-primary" onclick="showProductoModal()">
+          + Nuevo Producto
+        </button>
+      </div>
+      <div class="table-responsive">
+        <table class="table table-striped">
+          <thead>
+            <tr>
+              <th>ID</th>
+              <th>Nombre</th>
+              <th>Precio</th>
+              <th>Stock</th>
+              <th>Categoría</th>
+              <th>Activo</th>
+              <th>Acciones</th>
+            </tr>
+          </thead>
+          <tbody id="productos-tbody">
+            <tr><td colspan="7" class="text-center py-4">
+              <div class="spinner-border text-success" role="status"></div>
+            </td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- ═══════════ CATEGORÍAS TAB ═══════════ -->
+    <div id="tab-categorias" class="tab-content" style="display:none">
+      <div class="d-flex justify-content-between align-items-center mb-3">
+        <h5>Gestión de Categorías</h5>
+        <button class="btn btn-primary" onclick="showCategoriaModal()">
+          + Nueva Categoría
+        </button>
+      </div>
+      <div class="table-responsive">
+        <table class="table table-striped">
+          <thead>
+            <tr>
+              <th>ID</th>
+              <th>Nombre</th>
+              <th>Descripción</th>
+              <th>Acciones</th>
+            </tr>
+          </thead>
+          <tbody id="categorias-tbody">
+            <tr><td colspan="4" class="text-center py-4">
+              <div class="spinner-border text-success" role="status"></div>
+            </td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- ═══════════ PEDIDOS TAB ═══════════ -->
+    <div id="tab-pedidos" class="tab-content" style="display:none">
+      <h5 class="mb-3">Gestión de Pedidos</h5>
+      <div class="table-responsive">
+        <table class="table table-striped">
+          <thead>
+            <tr>
+              <th>ID</th>
+              <th>Cliente</th>
+              <th>Total</th>
+              <th>Tipo</th>
+              <th>Estado</th>
+              <th>Fecha</th>
+              <th>Acción</th>
+            </tr>
+          </thead>
+          <tbody id="pedidos-tbody">
+            <tr><td colspan="7" class="text-center py-4">
+              <div class="spinner-border text-success" role="status"></div>
+            </td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- ═══════════ ENVÍOS TAB ═══════════ -->
+    <div id="tab-envios" class="tab-content" style="display:none">
+      <h5 class="mb-3">Configuración de Envíos</h5>
+      <div id="envios-alert" class="alert d-none"></div>
+      <form id="envios-form">
+        <div class="row g-3" id="envios-fields"></div>
+        <button type="submit" class="btn btn-primary mt-3">Guardar Configuración</button>
+      </form>
+    </div>
+  </div>
+
+  <!-- ════════════════ MODALS ════════════════ -->
+
+  <!-- Producto Modal -->
+  <div class="modal fade" id="productoModal" tabindex="-1"
+       aria-labelledby="productoModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="productoModalLabel">Nuevo Producto</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+        </div>
+        <form id="producto-form">
+          <div class="modal-body">
+            <input type="hidden" id="prod-id" />
+            <div class="row g-3">
+              <div class="col-md-6">
+                <label for="prod-nombre" class="form-label">Nombre *</label>
+                <input type="text" class="form-control" id="prod-nombre" required />
+              </div>
+              <div class="col-md-6">
+                <label for="prod-categoria" class="form-label">Categoría *</label>
+                <select class="form-select" id="prod-categoria" required>
+                  <option value="">Cargando...</option>
+                </select>
+              </div>
+              <div class="col-12">
+                <label for="prod-descripcion" class="form-label">Descripción</label>
+                <textarea class="form-control" id="prod-descripcion" rows="2"></textarea>
+              </div>
+              <div class="col-md-4">
+                <label for="prod-tipo" class="form-label">Tipo *</label>
+                <select class="form-select" id="prod-tipo" required>
+                  <option value="KG">Por Kilo</option>
+                  <option value="UNIDAD">Por Unidad</option>
+                </select>
+              </div>
+              <div class="col-md-4">
+                <label for="prod-precio-kg" class="form-label">Precio por KG *</label>
+                <input type="number" class="form-control" id="prod-precio-kg"
+                       step="0.01" min="0" required />
+              </div>
+              <div class="col-md-4" id="prod-precio-unidad-group" style="display:none">
+                <label for="prod-precio-unidad" class="form-label">Precio por Unidad</label>
+                <input type="number" class="form-control" id="prod-precio-unidad"
+                       step="0.01" min="0" />
+              </div>
+              <div class="col-md-4">
+                <label for="prod-stock-kg" class="form-label">Stock (KG)</label>
+                <input type="number" class="form-control" id="prod-stock-kg"
+                       step="0.01" min="0" />
+              </div>
+              <div class="col-md-4">
+                <label for="prod-stock-unidades" class="form-label">Stock (Unidades)</label>
+                <input type="number" class="form-control" id="prod-stock-unidades"
+                       step="1" min="0" />
+              </div>
+              <div class="col-md-6">
+                <label for="prod-imagen1" class="form-label">Imagen 1</label>
+                <input type="file" class="form-control" id="prod-imagen1"
+                       accept="image/jpeg,image/png,image/webp" />
+              </div>
+              <div class="col-md-6">
+                <label for="prod-imagen2" class="form-label">Imagen 2</label>
+                <input type="file" class="form-control" id="prod-imagen2"
+                       accept="image/jpeg,image/png,image/webp" />
+              </div>
+            </div>
+            <div id="prod-error" class="alert alert-danger mt-3 d-none"></div>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+            <button type="submit" class="btn btn-primary">Guardar</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- Categoría Modal -->
+  <div class="modal fade" id="categoriaModal" tabindex="-1"
+       aria-labelledby="categoriaModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="categoriaModalLabel">Nueva Categoría</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+        </div>
+        <form id="categoria-form">
+          <div class="modal-body">
+            <div class="mb-3">
+              <label for="cat-nombre" class="form-label">Nombre *</label>
+              <input type="text" class="form-control" id="cat-nombre" required />
+            </div>
+            <div class="mb-3">
+              <label for="cat-descripcion" class="form-label">Descripción</label>
+              <textarea class="form-control" id="cat-descripcion" rows="2"></textarea>
+            </div>
+            <div id="cat-error" class="alert alert-danger d-none"></div>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+            <button type="submit" class="btn btn-primary">Guardar</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- ════════════════ SCRIPTS ════════════════ -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
+          integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz"
+          crossorigin="anonymous"></script>
+  <script src="/js/admin.js"></script>
+
+  <script>
+    /* ── Auth Guard ──────────────────────────────────────────────── */
+
+    if (!admin.isAuthenticated()) {
+      window.location.href = "/admin/login.html";
+    }
+
+    /* ── Tab Switching ───────────────────────────────────────────── */
+
+    document.querySelectorAll("[data-tab]").forEach((btn) => {
+      btn.addEventListener("click", () => {
+        document.querySelectorAll(".tab-content").forEach((t) => (t.style.display = "none"));
+        document.getElementById(`tab-${btn.dataset.tab}`).style.display = "block";
+        document.querySelectorAll(".nav-link").forEach((l) => l.classList.remove("active"));
+        btn.classList.add("active");
+
+        const tab = btn.dataset.tab;
+        if (tab === "productos") loadProductos();
+        if (tab === "categorias") loadCategorias();
+        if (tab === "pedidos") loadPedidos();
+        if (tab === "envios") loadEnvios();
+      });
+    });
+
+    /* ── Productos ───────────────────────────────────────────────── */
+
+    let categoriasCache = [];
+
+    async function loadProductos() {
+      const tbody = document.getElementById("productos-tbody");
+      try {
+        const productos = await admin.getProductos();
+        categoriasCache = await admin.getCategorias();
+
+        if (productos.length === 0) {
+          tbody.innerHTML =
+            '<tr><td colspan="7" class="text-center text-muted py-4">No hay productos. ¡Creá el primero!</td></tr>';
+          return;
+        }
+
+        tbody.innerHTML = productos
+          .map((p) => {
+            const cat = categoriasCache.find((c) => c.id === p.categoria_id);
+            const catNombre = cat ? cat.nombre : `#${p.categoria_id}`;
+            const tipoLabel = p.tipo_unidad === "KG" ? " / 100g" : " / unidad";
+            const precio =
+              p.tipo_unidad === "KG"
+                ? parseFloat(p.precio_por_kg || 0) / 10
+                : parseFloat(p.precio_por_unidad || 0);
+            const stock =
+              p.tipo_unidad === "KG"
+                ? `${parseFloat(p.stock_kg || 0) * 1000}g`
+                : `${parseInt(p.stock_unidades || 0)} u`;
+
+            return `
+            <tr id="prod-row-${p.id}">
+              <td>${p.id}</td>
+              <td>${p.nombre}</td>
+              <td>$${precio.toFixed(2)}${tipoLabel}</td>
+              <td>${stock}</td>
+              <td>${catNombre}</td>
+              <td><span class="badge bg-${p.activo ? "success" : "secondary"}">${p.activo ? "Sí" : "No"}</span></td>
+              <td>
+                <button class="btn btn-sm btn-outline-primary me-1" onclick="editProducto(${p.id})">Editar</button>
+                <button class="btn btn-sm btn-outline-danger" onclick="deleteProducto(${p.id})">Eliminar</button>
+              </td>
+            </tr>`;
+          })
+          .join("");
+      } catch (err) {
+        tbody.innerHTML = `<tr><td colspan="7" class="text-center text-danger py-4">Error: ${err.message}</td></tr>`;
+      }
+    }
+
+    function showProductoModal(id = null) {
+      const form = document.getElementById("producto-form");
+      form.reset();
+      document.getElementById("prod-id").value = "";
+      document.getElementById("prod-error").classList.add("d-none");
+      document.getElementById("productoModalLabel").textContent = "Nuevo Producto";
+
+      // Populate categorías dropdown
+      const catSelect = document.getElementById("prod-categoria");
+      catSelect.innerHTML = categoriasCache
+        .map((c) => `<option value="${c.id}">${c.nombre}</option>`)
+        .join("");
+
+      if (id) {
+        // Edit mode
+        document.getElementById("productoModalLabel").textContent = "Editar Producto";
+        document.getElementById("prod-id").value = id;
+        // Pre-fill will be handled by editProducto
+      }
+
+      // Tipo change handler
+      const tipoSelect = document.getElementById("prod-tipo");
+      const precioUnidadGroup = document.getElementById("prod-precio-unidad-group");
+      const precioUnidadInput = document.getElementById("prod-precio-unidad");
+
+      const toggleTipo = () => {
+        const showUnidad = tipoSelect.value === "UNIDAD";
+        precioUnidadGroup.style.display = showUnidad ? "" : "none";
+        precioUnidadInput.required = showUnidad;
+      };
+
+      tipoSelect.addEventListener("change", toggleTipo);
+      toggleTipo();
+
+      const modal = new bootstrap.Modal(document.getElementById("productoModal"));
+      modal.show();
+    }
+
+    async function editProducto(id) {
+      const productos = await admin.getProductos();
+      const p = productos.find((prod) => prod.id === id);
+      if (!p) return;
+
+      showProductoModal(id);
+
+      // Wait for modal to appear then fill
+      setTimeout(() => {
+        document.getElementById("prod-nombre").value = p.nombre || "";
+        document.getElementById("prod-descripcion").value = p.descripcion || "";
+        document.getElementById("prod-tipo").value = p.tipo_unidad;
+        document.getElementById("prod-precio-kg").value = parseFloat(p.precio_por_kg || 0);
+        document.getElementById("prod-precio-unidad").value = parseFloat(p.precio_por_unidad || 0);
+        document.getElementById("prod-stock-kg").value = parseFloat(p.stock_kg || 0) || "";
+        document.getElementById("prod-stock-unidades").value = parseInt(p.stock_unidades || 0) || "";
+        document.getElementById("prod-categoria").value = p.categoria_id;
+        if (p.imagenes && p.imagenes.length > 0)
+          document.getElementById("prod-imagen1").value = p.imagenes[0].url || "";
+        if (p.imagenes && p.imagenes.length > 1)
+          document.getElementById("prod-imagen2").value = p.imagenes[1].url || "";
+
+        // Trigger tipo toggle
+        document.getElementById("prod-tipo").dispatchEvent(new Event("change"));
+      }, 200);
+    }
+
+    async function deleteProducto(id) {
+      if (!confirm("¿Eliminar este producto?")) return;
+      try {
+        await admin.deleteProducto(id);
+        loadProductos();
+      } catch (err) {
+        alert(err.message || "Error al eliminar.");
+      }
+    }
+
+    async function uploadFile(file) {
+      const formData = new FormData();
+      formData.append("file", file);
+      const res = await admin.fetch("/productos/upload", {
+        method: "POST",
+        body: formData,
+      });
+      if (!res.ok) throw new Error("Error al subir imagen");
+      return (await res.json()).url;
+    }
+
+    document.getElementById("producto-form").addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const errDiv = document.getElementById("prod-error");
+      errDiv.classList.add("d-none");
+
+      const id = document.getElementById("prod-id").value;
+
+      // Upload images first
+      const imagenes = [];
+      const file1 = document.getElementById("prod-imagen1").files[0];
+      const file2 = document.getElementById("prod-imagen2").files[0];
+      try {
+        if (file1) {
+          const url = await uploadFile(file1);
+          imagenes.push({ url });
+        }
+        if (file2) {
+          const url = await uploadFile(file2);
+          imagenes.push({ url });
+        }
+      } catch (err) {
+        errDiv.textContent = "Error al subir imágenes: " + err.message;
+        errDiv.classList.remove("d-none");
+        return;
+      }
+
+      const data = {
+        nombre: document.getElementById("prod-nombre").value.trim(),
+        descripcion: document.getElementById("prod-descripcion").value.trim() || null,
+        precio_por_kg: parseFloat(document.getElementById("prod-precio-kg").value) || 0,
+        tipo_unidad: document.getElementById("prod-tipo").value,
+        stock_kg: parseFloat(document.getElementById("prod-stock-kg").value) || null,
+        stock_unidades: parseInt(document.getElementById("prod-stock-unidades").value) || null,
+        categoria_id: parseInt(document.getElementById("prod-categoria").value),
+      };
+
+      if (data.tipo_unidad === "UNIDAD") {
+        data.precio_por_unidad = parseFloat(document.getElementById("prod-precio-unidad").value) || 0;
+      }
+
+      try {
+        if (id) {
+          // Update
+          const updateData = { ...data, imagenes };
+          await admin.updateProducto(parseInt(id), updateData);
+        } else {
+          // Create
+          await admin.createProducto({ ...data, imagenes });
+        }
+        bootstrap.Modal.getInstance(document.getElementById("productoModal")).hide();
+        loadProductos();
+      } catch (err) {
+        errDiv.textContent = err.message;
+        errDiv.classList.remove("d-none");
+      }
+    });
+
+    /* ── Categorías ──────────────────────────────────────────────── */
+
+    async function loadCategorias() {
+      const tbody = document.getElementById("categorias-tbody");
+      try {
+        const cats = await admin.getCategorias();
+        categoriasCache = cats;
+
+        if (cats.length === 0) {
+          tbody.innerHTML =
+            '<tr><td colspan="4" class="text-center text-muted py-4">No hay categorías. ¡Creá la primera!</td></tr>';
+          return;
+        }
+
+        tbody.innerHTML = cats
+          .map(
+            (c) => `
+          <tr>
+            <td>${c.id}</td>
+            <td>${c.nombre}</td>
+            <td>${c.descripcion || "—"}</td>
+            <td>
+              <span class="text-muted">—</span>
+            </td>
+          </tr>`
+          )
+          .join("");
+      } catch (err) {
+        tbody.innerHTML = `<tr><td colspan="4" class="text-center text-danger py-4">Error: ${err.message}</td></tr>`;
+      }
+    }
+
+    function showCategoriaModal() {
+      document.getElementById("categoria-form").reset();
+      document.getElementById("cat-error").classList.add("d-none");
+      new bootstrap.Modal(document.getElementById("categoriaModal")).show();
+    }
+
+    document.getElementById("categoria-form").addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const errDiv = document.getElementById("cat-error");
+      errDiv.classList.add("d-none");
+
+      const nombre = document.getElementById("cat-nombre").value.trim();
+      const descripcion = document.getElementById("cat-descripcion").value.trim() || null;
+
+      try {
+        await admin.createCategoria({ nombre, descripcion });
+        bootstrap.Modal.getInstance(document.getElementById("categoriaModal")).hide();
+        loadCategorias();
+      } catch (err) {
+        errDiv.textContent = err.message;
+        errDiv.classList.remove("d-none");
+      }
+    });
+
+    /* ── Pedidos ─────────────────────────────────────────────────── */
+
+    async function loadPedidos() {
+      const tbody = document.getElementById("pedidos-tbody");
+      try {
+        const pedidos = await admin.getPedidos();
+
+        if (pedidos.length === 0) {
+          tbody.innerHTML =
+            '<tr><td colspan="7" class="text-center text-muted py-4">No hay pedidos.</td></tr>';
+          return;
+        }
+
+        tbody.innerHTML = pedidos
+          .map((p) => {
+            const tipoLabel = p.tipo_entrega === "ENVIO" ? "Envío" : "Retiro";
+            const dateStr = p.created_at
+              ? new Date(p.created_at).toLocaleDateString("es-AR", {
+                  day: "2-digit",
+                  month: "2-digit",
+                  year: "numeric",
+                  hour: "2-digit",
+                  minute: "2-digit",
+                })
+              : "—";
+
+            return `
+            <tr>
+              <td>#${p.id}</td>
+              <td>${p.cliente_nombre}</td>
+              <td>$${parseFloat(p.total || 0).toFixed(2)}</td>
+              <td>${tipoLabel}</td>
+              <td>
+                <select class="form-select form-select-sm estado-select"
+                        data-pedido-id="${p.id}"
+                        style="width:140px">
+                  <option value="PENDIENTE" ${p.estado === "PENDIENTE" ? "selected" : ""}>Pendiente</option>
+                  <option value="CONFIRMADO" ${p.estado === "CONFIRMADO" ? "selected" : ""}>Confirmado</option>
+                  <option value="ENTREGADO" ${p.estado === "ENTREGADO" ? "selected" : ""}>Entregado</option>
+                  <option value="CANCELADO" ${p.estado === "CANCELADO" ? "selected" : ""}>Cancelado</option>
+                </select>
+              </td>
+              <td>${dateStr}</td>
+              <td>
+                <span class="badge bg-${p.estado === "CANCELADO" ? "danger" : p.estado === "ENTREGADO" ? "success" : "warning"}">
+                  ${p.estado}
+                </span>
+              </td>
+            </tr>`;
+          })
+          .join("");
+
+        // Attach estado change handlers
+        tbody.querySelectorAll(".estado-select").forEach((sel) => {
+          sel.addEventListener("change", async (e) => {
+            const pedidoId = parseInt(e.target.dataset.pedidoId, 10);
+            const nuevoEstado = e.target.value;
+            try {
+              await admin.updatePedidoEstado(pedidoId, nuevoEstado);
+              // Reload to refresh badge
+              loadPedidos();
+            } catch (err) {
+              alert(err.message || "Error al actualizar estado.");
+              loadPedidos(); // Revert UI
+            }
+          });
+        });
+      } catch (err) {
+        tbody.innerHTML = `<tr><td colspan="7" class="text-center text-danger py-4">Error: ${err.message}</td></tr>`;
+      }
+    }
+
+    /* ── Envíos ──────────────────────────────────────────────────── */
+
+    async function loadEnvios() {
+      const fieldsDiv = document.getElementById("envios-fields");
+      try {
+        const configs = await admin.getEnvios();
+        fieldsDiv.innerHTML = configs
+          .map(
+            (c) => `
+          <div class="col-md-3 mb-3">
+            <label class="form-label">${c.zona}</label>
+            <input type="number" class="form-control zona-costo"
+                   data-zona="${c.zona}"
+                   value="${parseFloat(c.costo || 0)}"
+                   step="0.01" min="0" required />
+          </div>`
+          )
+          .join("");
+      } catch (err) {
+        fieldsDiv.innerHTML = `<div class="alert alert-danger">Error: ${err.message}</div>`;
+      }
+    }
+
+    document.getElementById("envios-form").addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const alertDiv = document.getElementById("envios-alert");
+      alertDiv.classList.add("d-none");
+
+      const zonas = [];
+      document.querySelectorAll(".zona-costo").forEach((input) => {
+        zonas.push({
+          zona: input.dataset.zona,
+          costo: parseFloat(input.value) || 0,
+        });
+      });
+
+      try {
+        await admin.updateEnvios({ zonas });
+        alertDiv.textContent = "Configuración guardada correctamente.";
+        alertDiv.classList.add("alert-success");
+        alertDiv.classList.remove("d-none");
+      } catch (err) {
+        alertDiv.textContent = err.message;
+        alertDiv.classList.add("alert-danger");
+        alertDiv.classList.remove("d-none");
+      }
+    });
+
+    /* ── Init ────────────────────────────────────────────────────── */
+
+    document.addEventListener("DOMContentLoaded", () => {
+      loadProductos();
+    });
+  </script>
+</body>
+</html>
