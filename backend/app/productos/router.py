@@ -1,4 +1,8 @@
-from fastapi import APIRouter, Depends, HTTPException, Query, status
+import os
+import uuid
+from pathlib import Path
+
+from fastapi import APIRouter, Depends, HTTPException, Query, UploadFile, File, status
 from fastapi.responses import HTMLResponse
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -108,6 +112,31 @@ async def productos_page(
         cards_html += '<div class="col-12 text-center py-3 text-muted"><small>No hay más productos</small></div>'
 
     return cards_html
+
+
+UPLOAD_DIR = Path(__file__).resolve().parent.parent.parent.parent / "frontend" / "img" / "uploads"
+
+
+@productos_router.post("/upload", status_code=status.HTTP_200_OK)
+async def upload_product_image(
+    file: UploadFile = File(...),
+    _admin: Admin = Depends(get_current_admin),
+):
+    """Upload a product image file. Returns the URL path."""
+    os.makedirs(UPLOAD_DIR, exist_ok=True)
+
+    ext = os.path.splitext(file.filename or ".jpg")[1].lower()
+    if ext not in (".jpg", ".jpeg", ".png", ".webp", ".gif"):
+        raise HTTPException(status_code=400, detail="Formato no soportado. Usá JPG, PNG, WEBP o GIF.")
+
+    filename = f"{uuid.uuid4().hex}{ext}"
+    filepath = UPLOAD_DIR / filename
+
+    content = await file.read()
+    with open(filepath, "wb") as f:
+        f.write(content)
+
+    return {"url": f"/img/uploads/{filename}"}
 
 
 @productos_router.get("/{producto_id}", response_model=ProductoResponse)

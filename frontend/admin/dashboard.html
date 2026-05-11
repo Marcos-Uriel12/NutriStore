@@ -205,14 +205,14 @@
                        step="1" min="0" />
               </div>
               <div class="col-md-6">
-                <label for="prod-imagen1" class="form-label">Imagen URL 1</label>
-                <input type="url" class="form-control" id="prod-imagen1"
-                       placeholder="https://..." />
+                <label for="prod-imagen1" class="form-label">Imagen 1</label>
+                <input type="file" class="form-control" id="prod-imagen1"
+                       accept="image/jpeg,image/png,image/webp" />
               </div>
               <div class="col-md-6">
-                <label for="prod-imagen2" class="form-label">Imagen URL 2</label>
-                <input type="url" class="form-control" id="prod-imagen2"
-                       placeholder="https://..." />
+                <label for="prod-imagen2" class="form-label">Imagen 2</label>
+                <input type="file" class="form-control" id="prod-imagen2"
+                       accept="image/jpeg,image/png,image/webp" />
               </div>
             </div>
             <div id="prod-error" class="alert alert-danger mt-3 d-none"></div>
@@ -411,17 +411,42 @@
       }
     }
 
+    async function uploadFile(file) {
+      const formData = new FormData();
+      formData.append("file", file);
+      const res = await admin.fetch("/productos/upload", {
+        method: "POST",
+        body: formData,
+      });
+      if (!res.ok) throw new Error("Error al subir imagen");
+      return (await res.json()).url;
+    }
+
     document.getElementById("producto-form").addEventListener("submit", async (e) => {
       e.preventDefault();
       const errDiv = document.getElementById("prod-error");
       errDiv.classList.add("d-none");
 
       const id = document.getElementById("prod-id").value;
+
+      // Upload images first
       const imagenes = [];
-      const url1 = document.getElementById("prod-imagen1").value.trim();
-      const url2 = document.getElementById("prod-imagen2").value.trim();
-      if (url1) imagenes.push({ url: url1 });
-      if (url2) imagenes.push({ url: url2 });
+      const file1 = document.getElementById("prod-imagen1").files[0];
+      const file2 = document.getElementById("prod-imagen2").files[0];
+      try {
+        if (file1) {
+          const url = await uploadFile(file1);
+          imagenes.push({ url });
+        }
+        if (file2) {
+          const url = await uploadFile(file2);
+          imagenes.push({ url });
+        }
+      } catch (err) {
+        errDiv.textContent = "Error al subir imágenes: " + err.message;
+        errDiv.classList.remove("d-none");
+        return;
+      }
 
       const data = {
         nombre: document.getElementById("prod-nombre").value.trim(),
@@ -439,7 +464,7 @@
 
       try {
         if (id) {
-          // Update: only send changed fields
+          // Update
           const updateData = { ...data, imagenes };
           await admin.updateProducto(parseInt(id), updateData);
         } else {
