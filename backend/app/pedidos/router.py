@@ -42,6 +42,18 @@ async def list_pedidos(
     return await pedidos_service.list_pedidos(db, session_id=None)
 
 
+@router.get("/public/{pedido_id}", response_model=PedidoResponse)
+async def get_pedido_public(
+    pedido_id: int,
+    db: AsyncSession = Depends(get_db),
+):
+    """Public endpoint to look up an order by its ID (for order tracking)."""
+    pedido = await pedidos_service.get_pedido(db, pedido_id)
+    if pedido is None:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Pedido no encontrado")
+    return pedido
+
+
 @router.get("/{pedido_id}", response_model=PedidoResponse)
 async def get_pedido(
     pedido_id: int,

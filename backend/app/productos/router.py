@@ -1,9 +1,12 @@
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, Depends, HTTPException, Query, status
+from fastapi.responses import HTMLResponse
+from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.database import get_db
 from app.dependencies import get_current_admin
 from app.models.admin import Admin
+from app.models.producto import Producto
 from app.productos.schemas import (
     CategoriaCreate,
     CategoriaResponse,
@@ -45,6 +48,66 @@ async def create_categoria(
 @productos_router.get("", response_model=list[ProductoResponse])
 async def list_productos(db: AsyncSession = Depends(get_db)):
     return await productos_service.list_productos(db)
+
+
+@productos_router.get("/page", response_class=HTMLResponse)
+async def productos_page(
+    p: int = Query(1, ge=1),
+    limit: int = Query(8, ge=1, le=50),
+    db: AsyncSession = Depends(get_db),
+):
+    """Return Bootstrap product cards as HTML fragment for HTMX infinite scroll."""
+    offset = (p - 1) * limit
+    result = await db.execute(
+        select(Producto)
+        .where(Producto.activo == True)
+        .offset(offset)
+        .limit(limit + 1)
+        .order_by(Producto.nombre)
+    )
+    productos = result.scalars().all()
+    has_next = len(productos) > limit
+    productos = productos[:limit]
+
+    cards_html = ""
+    for prod in productos:
+        img_url = prod.imagenes[0].url if prod.imagenes else ""
+        if prod.tipo_unidad.value == "KG":
+            precio = f"${prod.precio_por_kg:.2f} / kg"
+        else:
+            precio = f"${prod.precio_por_unidad:.2f} / unidad" if prod.precio_por_unidad else ""
+
+        cards_html += f"""
+        <div class="col-md-3 col-6 mb-4">
+            <div class="card product-card h-100">
+                <img src="{img_url}" class="card-img-top" alt="{prod.nombre}" loading="lazy">
+                <div class="card-body">
+                    <h6 class="card-title">{prod.nombre}</h6>
+                    <p class="card-text text-muted small">{precio}</p>
+                    <button class="btn btn-sm btn-primary add-to-cart"
+                            data-producto-id="{prod.id}"
+                            data-nombre="{prod.nombre}"
+                            data-precio="{precio}">
+                        Agregar
+                    </button>
+                </div>
+            </div>
+        </div>"""
+
+    if has_next:
+        cards_html += f"""<div class="col-12 text-center py-3"
+            hx-get="/productos/page?p={p + 1}&limit={limit}"
+            hx-trigger="revealed"
+            hx-swap="outerHTML"
+            hx-target="this">
+            <div class="spinner-border text-success" role="status">
+                <span class="visually-hidden">Cargando...</span>
+            </div>
+        </div>"""
+    else:
+        cards_html += '<div class="col-12 text-center py-3 text-muted"><small>No hay más productos</small></div>'
+
+    return cards_html
 
 
 @productos_router.get("/{producto_id}", response_model=ProductoResponse)
