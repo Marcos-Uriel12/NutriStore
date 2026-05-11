@@ -13,3 +13,7 @@ class CartItemResponse(BaseModel):
     producto_id: int
     cantidad: float
     unidad_medida: UnidadMedida
+    nombre: str = ""
+    precio: float = 0.0
+    imagen_url: str = ""
+    tipo_unidad: str = ""

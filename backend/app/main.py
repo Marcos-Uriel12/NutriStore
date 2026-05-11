@@ -1,6 +1,8 @@
 from contextlib import asynccontextmanager
+from pathlib import Path
 
 from fastapi import FastAPI
+from fastapi.staticfiles import StaticFiles
 from redis.asyncio import Redis
 
 from app.config import settings
@@ -36,3 +38,8 @@ app.include_router(productos_router, prefix="/productos", tags=["Productos"])
 app.include_router(carrito_router, prefix="/carrito", tags=["Carrito"])
 app.include_router(pedidos_router, prefix="/pedidos", tags=["Pedidos"])
 app.include_router(envios_router, prefix="/envios", tags=["Envios"])
+
+# Mount frontend as static files — must be AFTER all API routers
+_frontend_path = Path(__file__).resolve().parent.parent.parent / "frontend"
+if _frontend_path.is_dir():
+    app.mount("/", StaticFiles(directory=str(_frontend_path), html=True), name="frontend")
