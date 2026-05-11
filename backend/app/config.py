@@ -10,6 +10,12 @@ class Settings(BaseSettings):
     ADMIN_EMAIL: str = "admin@nutristore.com"
     ADMIN_PASSWORD: str = "admin123"
 
+    # SMTP (Email)
+    SMTP_HOST: str = ""
+    SMTP_PORT: int = 587
+    SMTP_USER: str = ""
+    SMTP_PASSWORD: str = ""
+
     model_config = {"env_file": ".env"}
 
 

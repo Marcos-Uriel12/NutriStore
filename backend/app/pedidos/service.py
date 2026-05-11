@@ -139,6 +139,7 @@ async def create_pedido(
         cliente_nombre=data.cliente_nombre,
         cliente_direccion=data.cliente_direccion,
         cliente_telefono=data.cliente_telefono,
+        cliente_email=data.cliente_email,
         direccion_entrega=direccion_entrega,
         tipo_entrega=data.tipo_entrega,
         zona_envio=data.zona_envio if data.tipo_entrega == TipoEntrega.ENVIO else None,
@@ -169,7 +170,14 @@ async def create_pedido(
     await db.commit()
     await db.refresh(pedido)
 
-    # 7. Clear Redis cart
+    # 8. Send email notifications (best-effort, non-blocking)
+    try:
+        from app.email_service import send_order_email
+        send_order_email(pedido)
+    except Exception:
+        pass  # Email failure shouldn't break the order
+
+    # 9. Clear Redis cart
     await redis.delete(f"cart:{session_id}")
 
     return pedido

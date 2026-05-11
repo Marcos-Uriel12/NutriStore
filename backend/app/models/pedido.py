@@ -42,6 +42,7 @@ class Pedido(Base):
     cliente_nombre: Mapped[str] = mapped_column(String(200), nullable=False)
     cliente_direccion: Mapped[str] = mapped_column(String(500), nullable=False)
     cliente_telefono: Mapped[str] = mapped_column(String(50), nullable=False)
+    cliente_email: Mapped[str] = mapped_column(String(255), nullable=False, default="")
     direccion_entrega: Mapped[str] = mapped_column(String(500), nullable=False)
     tipo_entrega: Mapped[TipoEntrega] = mapped_column(Enum(TipoEntrega), nullable=False)
     zona_envio: Mapped[ZonaEnvio | None] = mapped_column(Enum(ZonaEnvio), nullable=True)

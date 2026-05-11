@@ -97,6 +97,11 @@
                 <input type="tel" class="form-control" id="checkout-telefono"
                        name="telefono" required />
               </div>
+              <div class="col-md-6">
+                <label for="checkout-email" class="form-label">Email *</label>
+                <input type="email" class="form-control" id="checkout-email"
+                       name="email" required />
+              </div>
               <div class="col-12">
                 <label for="checkout-direccion" class="form-label">Dirección *</label>
                 <input type="text" class="form-control" id="checkout-direccion"
@@ -332,6 +337,7 @@
         cliente_nombre: form.nombre.value.trim(),
         cliente_direccion: form.direccion.value.trim(),
         cliente_telefono: form.telefono.value.trim(),
+        cliente_email: form.email.value.trim(),
         direccion_entrega: form.direccion.value.trim(),
         tipo_entrega: form.tipo_entrega.value,
         metodo_pago: form.metodo_pago.value,
