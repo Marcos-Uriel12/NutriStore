@@ -235,5 +235,26 @@ async def update_estado(
 
     pedido.estado = nuevo_estado
     await db.commit()
-    await db.refresh(pedido)
+
+    # 8. Send email notifications (best-effort)
+    # Re-load pedido with all relationships for the email
+    try:
+        from sqlalchemy import select
+        stmt = (
+            select(Pedido)
+            .options(
+                selectinload(Pedido.items).selectinload(PedidoItem.producto),
+                selectinload(Pedido.pago),
+            )
+            .where(Pedido.id == pedido.id)
+        )
+        result = await db.execute(stmt)
+        pedido_email = result.scalar_one()
+
+        from app.email_service import send_order_email
+        send_order_email(pedido_email)
+    except Exception as e:
+        import logging
+        logging.getLogger(__name__).warning("Email not sent for pedido #%s: %s", pedido.id, e)
+
     return pedido
