@@ -37,6 +37,9 @@ async def lifespan(app: FastAPI):
     finally:
         await app.state.redis.close()
 
+
+app = FastAPI(title="NutriStore API", lifespan=lifespan) 
+
 # CORS for frontend deployed separately
 app.add_middleware(
     CORSMiddleware,
