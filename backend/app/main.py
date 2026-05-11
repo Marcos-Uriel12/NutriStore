@@ -14,6 +14,10 @@ from app.carrito.router import router as carrito_router
 from app.pedidos.router import router as pedidos_router
 from app.envios.router import router as envios_router
 
+import sys
+print(f"Python: {sys.version}", flush=True)
+print(f"Path: {sys.path}", flush=True)
+
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
