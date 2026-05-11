@@ -31,8 +31,9 @@ class CategoriaResponse(BaseModel):
 class ProductoCreate(BaseModel):
     nombre: str
     descripcion: str | None = None
-    precio_por_kg: float
+    precio_por_kg: float = 0
     precio_por_unidad: float | None = None
+    gramos: int = 1000
     tipo_unidad: TipoUnidad
     stock_kg: float | None = None
     stock_unidades: int | None = None

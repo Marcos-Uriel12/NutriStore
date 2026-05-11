@@ -177,7 +177,7 @@
               .map(
                 (i) => `
             <li class="d-flex justify-content-between">
-              <span>${i.cantidad} x Producto #${i.producto_id}</span>
+              <span>${i.cantidad} x ${i.producto_nombre || `Producto #${i.producto_id}`}</span>
               <span>$${parseFloat(i.precio_unitario || 0).toFixed(2)} c/u</span>
             </li>`
               )
