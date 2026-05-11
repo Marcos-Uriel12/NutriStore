@@ -25,6 +25,16 @@ async def db_session(db_engine):
 
 
 @pytest.fixture
+async def fake_redis():
+    """Fake async Redis for testing cart/order flows."""
+    from fakeredis import FakeAsyncRedis
+
+    redis = FakeAsyncRedis(decode_responses=True)
+    yield redis
+    await redis.aclose()
+
+
+@pytest.fixture
 async def async_client(db_session):
     """Async HTTP client for testing FastAPI endpoints.
 
@@ -37,6 +47,27 @@ async def async_client(db_session):
         yield db_session
 
     app.dependency_overrides[get_db] = override_get_db
+    transport = ASGITransport(app=app)
+    async with AsyncClient(transport=transport, base_url="http://test") as client:
+        yield client
+    app.dependency_overrides.clear()
+
+
+@pytest.fixture
+async def async_client_with_redis(db_session, fake_redis):
+    """Override BOTH get_db AND get_redis for cart/order tests."""
+    from app.database import get_db
+    from app.dependencies import get_redis
+    from app.main import app
+
+    async def override_get_db():
+        yield db_session
+
+    async def override_get_redis():
+        yield fake_redis
+
+    app.dependency_overrides[get_db] = override_get_db
+    app.dependency_overrides[get_redis] = override_get_redis
     transport = ASGITransport(app=app)
     async with AsyncClient(transport=transport, base_url="http://test") as client:
         yield client
