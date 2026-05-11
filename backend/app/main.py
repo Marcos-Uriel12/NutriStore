@@ -17,21 +17,21 @@ from app.envios.router import router as envios_router
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    # Seed admin on startup (idempotent)
-    from app.usuarios.service import seed_admin
-
-    async with async_session() as session:
-        await seed_admin(session)
-
-    # Redis for anonymous cart (managed by lifespan)
-    app.state.redis = Redis.from_url(settings.REDIS_URL, decode_responses=True)
+    import traceback
+    try:
+        from app.usuarios.service import seed_admin
+        async with async_session() as session:
+            await seed_admin(session)
+        app.state.redis = Redis.from_url(settings.REDIS_URL, decode_responses=True)
+        print("✅ Startup OK")
+    except Exception as e:
+        print(f"❌ Startup error: {e}")
+        traceback.print_exc()
+        raise
     try:
         yield
     finally:
         await app.state.redis.close()
-
-
-app = FastAPI(title="NutriStore API", lifespan=lifespan)
 
 # CORS for frontend deployed separately
 app.add_middleware(
