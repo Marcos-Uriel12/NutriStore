@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Admin Login — NutriStore</title>
+
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet"
+        integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous" />
+  <link href="/css/style.css" rel="stylesheet" />
+</head>
+<body class="bg-light d-flex align-items-center justify-content-center min-vh-100">
+
+  <div class="container">
+    <div class="row justify-content-center">
+      <div class="col-sm-8 col-md-5 col-lg-4">
+        <div class="card login-card shadow">
+          <div class="card-body p-4">
+            <h3 class="text-center mb-4">NutriStore Admin</h3>
+
+            <form id="login-form" novalidate>
+              <div class="mb-3">
+                <label for="login-email" class="form-label">Email</label>
+                <input type="email"
+                       class="form-control"
+                       id="login-email"
+                       name="email"
+                       placeholder="admin@nutristore.com"
+                       required
+                       autocomplete="email" />
+                <div class="invalid-feedback">El email es requerido.</div>
+              </div>
+
+              <div class="mb-3">
+                <label for="login-password" class="form-label">Contraseña</label>
+                <input type="password"
+                       class="form-control"
+                       id="login-password"
+                       name="password"
+                       placeholder="••••••••"
+                       required
+                       autocomplete="current-password" />
+                <div class="invalid-feedback">La contraseña es requerida.</div>
+              </div>
+
+              <div id="login-error" class="alert alert-danger d-none"></div>
+
+              <button type="submit" class="btn btn-primary w-100" id="login-submit">
+                Ingresar
+              </button>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Scripts -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
+          integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz"
+          crossorigin="anonymous"></script>
+  <script src="/js/admin.js"></script>
+
+  <script>
+    const form = document.getElementById("login-form");
+    const errDiv = document.getElementById("login-error");
+    const submitBtn = document.getElementById("login-submit");
+
+    form.addEventListener("submit", async (e) => {
+      e.preventDefault();
+      form.classList.add("was-validated");
+
+      if (!form.checkValidity()) return;
+
+      errDiv.classList.add("d-none");
+      submitBtn.disabled = true;
+      submitBtn.innerHTML = `
+        <span class="spinner-border spinner-border-sm me-2" role="status"></span>
+        Ingresando...`;
+
+      try {
+        await admin.login(
+          form.email.value.trim(),
+          form.password.value
+        );
+        window.location.href = "/admin/dashboard.html";
+      } catch (err) {
+        errDiv.textContent = "Email o contraseña incorrectos.";
+        errDiv.classList.remove("d-none");
+      } finally {
+        submitBtn.disabled = false;
+        submitBtn.textContent = "Ingresar";
+      }
+    });
+  </script>
+</body>
+</html>

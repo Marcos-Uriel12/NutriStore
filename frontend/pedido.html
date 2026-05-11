@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Seguí tu Pedido — NutriStore</title>
+
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet"
+        integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous" />
+  <link href="/css/style.css" rel="stylesheet" />
+  <script src="https://unpkg.com/htmx.org@2.0.4"
+          integrity="sha384-HGf+0TLhI1VKU6L8AYkYQH4GpH0GJYk94J5TWAqA9f+xVxBuUQBkRjSWUFGpOQR"
+          crossorigin="anonymous"></script>
+</head>
+<body>
+
+  <!-- Navbar -->
+  <nav class="navbar navbar-expand-lg sticky-top">
+    <div class="container">
+      <a class="navbar-brand" href="/">NutriStore</a>
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse"
+              data-bs-target="#navbarNav" aria-controls="navbarNav"
+              aria-expanded="false" aria-label="Menú de navegación">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <div class="collapse navbar-collapse" id="navbarNav">
+        <ul class="navbar-nav ms-auto align-items-center">
+          <li class="nav-item"><a class="nav-link" href="/">Inicio</a></li>
+          <li class="nav-item">
+            <a class="nav-link" href="/carrito.html">
+              Carrito
+              <span id="cart-badge" class="cart-badge" style="display:none">0</span>
+            </a>
+          </li>
+          <li class="nav-item"><a class="nav-link active" href="/pedido.html">Mi Pedido</a></li>
+        </ul>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Order Tracking Section -->
+  <div class="container py-5">
+    <h2 class="section-title">Seguí tu Pedido</h2>
+
+    <div class="row justify-content-center">
+      <div class="col-md-6">
+        <div class="input-group input-group-lg mb-4">
+          <input type="number"
+                 id="pedido-id"
+                 class="form-control"
+                 placeholder="Número de pedido"
+                 aria-label="Número de pedido"
+                 min="1" />
+          <button class="btn btn-primary" onclick="buscarPedido()">
+            Buscar
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Result container -->
+    <div id="pedido-result" class="mt-4" style="display:none"></div>
+    <div id="pedido-error" class="mt-3" style="display:none"></div>
+  </div>
+
+  <!-- Footer -->
+  <footer class="footer">
+    <div class="container">
+      <div class="row">
+        <div class="col-md-4 mb-3 mb-md-0">
+          <h6>Contacto</h6>
+          <p class="mb-1">📍 Av. Siempre Viva 742</p>
+          <p class="mb-1">📞 (011) 4567-8901</p>
+          <p class="mb-0">✉️ hola@nutristore.com.ar</p>
+        </div>
+        <div class="col-md-4 mb-3 mb-md-0">
+          <h6>Horarios</h6>
+          <p class="mb-1">Lunes a Viernes: 9:00 – 20:00</p>
+          <p class="mb-1">Sábados: 9:00 – 14:00</p>
+          <p class="mb-0">Domingos: Cerrado</p>
+        </div>
+        <div class="col-md-4">
+          <h6>Redes</h6>
+          <p class="mb-1"><a href="#" target="_blank" rel="noopener">Instagram</a></p>
+          <p class="mb-1"><a href="#" target="_blank" rel="noopener">Facebook</a></p>
+          <p class="mb-0"><a href="#" target="_blank" rel="noopener">WhatsApp</a></p>
+        </div>
+      </div>
+      <div class="copyright">&copy; 2026 NutriStore — Todos los derechos reservados.</div>
+    </div>
+  </footer>
+
+  <!-- Scripts -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
+          integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz"
+          crossorigin="anonymous"></script>
+  <script src="/js/app.js"></script>
+
+  <script>
+    /* ── Buscar Pedido ──────────────────────────────────────────── */
+
+    async function buscarPedido() {
+      const id = document.getElementById("pedido-id").value.trim();
+      const resultDiv = document.getElementById("pedido-result");
+      const errorDiv = document.getElementById("pedido-error");
+
+      resultDiv.style.display = "none";
+      errorDiv.style.display = "none";
+
+      if (!id) {
+        errorDiv.innerHTML = `
+          <div class="alert alert-warning">Ingresá un número de pedido válido.</div>`;
+        errorDiv.style.display = "block";
+        return;
+      }
+
+      try {
+        const res = await fetch(`/pedidos/public/${id}`);
+        if (!res.ok) {
+          throw new Error(
+            res.status === 404
+              ? "Pedido no encontrado. Verificá el número e intentá de nuevo."
+              : "Error al consultar el pedido. Intentá de nuevo."
+          );
+        }
+        const pedido = await res.json();
+        renderPedido(pedido);
+      } catch (err) {
+        errorDiv.innerHTML = `
+          <div class="alert alert-warning">${err.message}</div>`;
+        errorDiv.style.display = "block";
+      }
+    }
+
+    /* ── Render Pedido ──────────────────────────────────────────── */
+
+    function renderPedido(p) {
+      const estados = ["PENDIENTE", "CONFIRMADO", "ENTREGADO"];
+      const esCancelado = p.estado === "CANCELADO";
+      const idx = esCancelado ? -1 : estados.indexOf(p.estado);
+      const total = parseFloat(p.total) || 0;
+
+      // Timeline
+      let timelineHtml = "";
+      if (esCancelado) {
+        timelineHtml = `
+          <div class="d-flex justify-content-center mb-4">
+            <div class="text-center text-danger">
+              <div class="fs-3">✕</div>
+              <strong>Cancelado</strong>
+            </div>
+          </div>`;
+      } else {
+        const timelineItems = [
+          { label: "Pendiente", icon: idx >= 0 ? "✓" : "○" },
+          { label: "Confirmado", icon: idx >= 1 ? "✓" : "○" },
+          { label: "Entregado", icon: idx >= 2 ? "✓" : "○" },
+        ];
+
+        timelineHtml = `
+          <div class="d-flex justify-content-between mb-4">
+            ${timelineItems
+              .map(
+                (t, i) => `
+              <div class="timeline-step ${i <= idx ? "complete" : i === idx + 1 ? "current" : "pending"}">
+                <div class="fs-4">${t.icon}</div>
+                <small>${t.label}</small>
+              </div>`
+              )
+              .join("")}
+          </div>`;
+      }
+
+      // Items list
+      const itemsHtml =
+        p.items && p.items.length > 0
+          ? p.items
+              .map(
+                (i) => `
+            <li class="d-flex justify-content-between">
+              <span>${i.cantidad} x Producto #${i.producto_id}</span>
+              <span>$${parseFloat(i.precio_unitario || 0).toFixed(2)} c/u</span>
+            </li>`
+              )
+              .join("")
+          : "<li class='text-muted'>Sin detalles de items</li>";
+
+      // Payment info
+      const pagoMetodo = p.pago ? p.pago.metodo : "—";
+      const pagoEstado = p.pago ? p.pago.estado : "—";
+
+      // Delivery info
+      const tipoEntrega =
+        p.tipo_entrega === "ENVIO"
+          ? `Envío (${p.zona_envio || "N/A"})`
+          : "Retiro en local";
+
+      const html = `
+        <div class="card shadow-sm">
+          <div class="card-header d-flex justify-content-between align-items-center">
+            <strong>Pedido #${p.id}</strong>
+            <span class="badge bg-${esCancelado ? "danger" : "success"} fs-6">
+              ${p.estado}
+            </span>
+          </div>
+          <div class="card-body">
+            ${timelineHtml}
+            <hr />
+            <div class="row">
+              <div class="col-md-6">
+                <p><strong>Cliente:</strong> ${p.cliente_nombre}</p>
+                <p><strong>Dirección:</strong> ${p.direccion_entrega || p.cliente_direccion}</p>
+                <p><strong>Teléfono:</strong> ${p.cliente_telefono}</p>
+              </div>
+              <div class="col-md-6">
+                <p><strong>Tipo de entrega:</strong> ${tipoEntrega}</p>
+                <p><strong>Total:</strong> <span class="fs-5">$${total.toFixed(2)}</span></p>
+                <p><strong>Pago:</strong> ${pagoMetodo} (${pagoEstado})</p>
+              </div>
+            </div>
+            <hr />
+            <h6>Items</h6>
+            <ul class="list-unstyled">${itemsHtml}</ul>
+          </div>
+        </div>`;
+
+      const resultDiv = document.getElementById("pedido-result");
+      resultDiv.innerHTML = html;
+      resultDiv.style.display = "block";
+    }
+
+    /* ── Auto-load from URL param ───────────────────────────────── */
+
+    document.addEventListener("DOMContentLoaded", () => {
+      const params = new URLSearchParams(window.location.search);
+      if (params.get("id")) {
+        document.getElementById("pedido-id").value = params.get("id");
+        buscarPedido();
+      }
+    });
+  </script>
+</body>
+</html>
