@@ -37,6 +37,7 @@ class ProductoCreate(BaseModel):
     stock_kg: float | None = None
     stock_unidades: int | None = None
     categoria_id: int
+    gramos: int = 1000
     imagenes: list[ImagenCreate] = []
 
     @field_validator("imagenes")
@@ -56,6 +57,7 @@ class ProductoUpdate(BaseModel):
     stock_kg: float | None = None
     stock_unidades: int | None = None
     categoria_id: int | None = None
+    gramos: int | None = None
     activo: bool | None = None
 
 
@@ -69,6 +71,7 @@ class ProductoResponse(BaseModel):
     stock_kg: float | None = None
     stock_unidades: int | None = None
     categoria_id: int
+    gramos: int
     activo: bool
     categoria: CategoriaResponse | None = None
     imagenes: list[ImagenResponse] = []

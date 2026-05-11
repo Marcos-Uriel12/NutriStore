@@ -48,6 +48,7 @@ async def create_producto(db: AsyncSession, data: ProductoCreate) -> Producto:
         stock_kg=data.stock_kg,
         stock_unidades=data.stock_unidades,
         categoria_id=data.categoria_id,
+        gramos=data.gramos,
     )
     for img in data.imagenes:
         producto.imagenes.append(Imagen(url=img.url))

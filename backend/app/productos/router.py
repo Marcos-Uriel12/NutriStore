@@ -77,9 +77,9 @@ async def productos_page(
     for prod in productos:
         img_url = prod.imagenes[0].url if prod.imagenes else "/img/placeholder.svg"
         if prod.tipo_unidad.value == "KG":
-            precio = f"${prod.precio_por_kg / 10:.2f} / 100g"
+            precio = f"${prod.precio_por_kg:.2f} / {prod.gramos}g"
         else:
-            precio = f"${prod.precio_por_unidad:.2f} / unidad" if prod.precio_por_unidad else ""
+            precio = f"${prod.precio_por_unidad:.2f}" if prod.precio_por_unidad else ""
 
         cards_html += f"""
         <div class="col-md-3 col-6 mb-4">

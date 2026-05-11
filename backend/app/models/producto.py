@@ -30,6 +30,7 @@ class Producto(Base):
     stock_kg: Mapped[float | None] = mapped_column(nullable=True)
     stock_unidades: Mapped[int | None] = mapped_column(nullable=True)
     categoria_id: Mapped[int] = mapped_column(ForeignKey("categorias.id"), nullable=False)
+    gramos: Mapped[int] = mapped_column(default=1000, nullable=False)
     activo: Mapped[bool] = mapped_column(Boolean, default=True, nullable=False)
 
     categoria: Mapped["Categoria"] = relationship("Categoria", lazy="selectin")

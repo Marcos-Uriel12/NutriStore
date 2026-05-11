@@ -182,25 +182,35 @@
                   <option value="UNIDAD">Por Unidad</option>
                 </select>
               </div>
-              <div class="col-md-4">
-                <label for="prod-precio-kg" class="form-label">Precio por KG *</label>
-                <input type="number" class="form-control" id="prod-precio-kg"
-                       step="0.01" min="0" required />
+              <div class="row g-3" id="kg-fields">
+                <div class="col-md-4">
+                  <label for="prod-precio" class="form-label">Precio $</label>
+                  <input type="number" class="form-control" id="prod-precio" step="0.01" min="0" required>
+                </div>
+                <div class="col-md-3">
+                  <label for="prod-gramos" class="form-label">Gramos</label>
+                  <select class="form-select" id="prod-gramos">
+                    <option value="100">100g</option>
+                    <option value="250">250g</option>
+                    <option value="500">500g</option>
+                    <option value="1000" selected>1kg</option>
+                    <option value="2000">2kg</option>
+                  </select>
+                </div>
+                <div class="col-md-4">
+                  <label for="prod-stock" class="form-label">Stock (kg)</label>
+                  <input type="number" class="form-control" id="prod-stock" step="0.1" min="0">
+                </div>
               </div>
-              <div class="col-md-4" id="prod-precio-unidad-group" style="display:none">
-                <label for="prod-precio-unidad" class="form-label">Precio por Unidad</label>
-                <input type="number" class="form-control" id="prod-precio-unidad"
-                       step="0.01" min="0" />
-              </div>
-              <div class="col-md-4">
-                <label for="prod-stock-kg" class="form-label">Stock (KG)</label>
-                <input type="number" class="form-control" id="prod-stock-kg"
-                       step="0.01" min="0" />
-              </div>
-              <div class="col-md-4">
-                <label for="prod-stock-unidades" class="form-label">Stock (Unidades)</label>
-                <input type="number" class="form-control" id="prod-stock-unidades"
-                       step="1" min="0" />
+              <div class="row g-3" id="unidad-fields" style="display:none">
+                <div class="col-md-4">
+                  <label for="prod-precio-unidad" class="form-label">Precio por unidad $</label>
+                  <input type="number" class="form-control" id="prod-precio-unidad" step="0.01" min="0">
+                </div>
+                <div class="col-md-3">
+                  <label for="prod-stock-unidades" class="form-label">Stock (unidades)</label>
+                  <input type="number" class="form-control" id="prod-stock-unidades" step="1" min="0">
+                </div>
               </div>
               <div class="col-md-6">
                 <label for="prod-imagen1" class="form-label">Imagen 1</label>
@@ -304,12 +314,11 @@
           .map((p) => {
             const cat = categoriasCache.find((c) => c.id === p.categoria_id);
             const catNombre = cat ? cat.nombre : `#${p.categoria_id}`;
-            const tipoLabel = p.tipo_unidad === "KG" ? " / 100g" : " / unidad";
-            const precio =
+            const precioLabel =
               p.tipo_unidad === "KG"
-                ? parseFloat(p.precio_por_kg || 0) / 10
-                : parseFloat(p.precio_por_unidad || 0);
-            const stock =
+                ? `$${parseFloat(p.precio_por_kg || 0).toFixed(2)} / ${p.gramos || 1000}g`
+                : `$${parseFloat(p.precio_por_unidad || 0).toFixed(2)}`;
+            const stockLabel =
               p.tipo_unidad === "KG"
                 ? `${parseFloat(p.stock_kg || 0) * 1000}g`
                 : `${parseInt(p.stock_unidades || 0)} u`;
@@ -318,8 +327,8 @@
             <tr id="prod-row-${p.id}">
               <td>${p.id}</td>
               <td>${p.nombre}</td>
-              <td>$${precio.toFixed(2)}${tipoLabel}</td>
-              <td>${stock}</td>
+               <td>${precioLabel}</td>
+              <td>${stockLabel}</td>
               <td>${catNombre}</td>
               <td><span class="badge bg-${p.activo ? "success" : "secondary"}">${p.activo ? "Sí" : "No"}</span></td>
               <td>
@@ -356,13 +365,18 @@
 
       // Tipo change handler
       const tipoSelect = document.getElementById("prod-tipo");
-      const precioUnidadGroup = document.getElementById("prod-precio-unidad-group");
-      const precioUnidadInput = document.getElementById("prod-precio-unidad");
+      const kgFields = document.getElementById("kg-fields");
+      const unidadFields = document.getElementById("unidad-fields");
 
       const toggleTipo = () => {
-        const showUnidad = tipoSelect.value === "UNIDAD";
-        precioUnidadGroup.style.display = showUnidad ? "" : "none";
-        precioUnidadInput.required = showUnidad;
+        const isKg = tipoSelect.value === "KG";
+        kgFields.style.display = isKg ? "" : "none";
+        unidadFields.style.display = isKg ? "none" : "";
+
+        const precioInput = document.getElementById("prod-precio");
+        const precioUnidadInput = document.getElementById("prod-precio-unidad");
+        precioInput.required = isKg;
+        precioUnidadInput.required = !isKg;
       };
 
       tipoSelect.addEventListener("change", toggleTipo);
@@ -384,9 +398,10 @@
         document.getElementById("prod-nombre").value = p.nombre || "";
         document.getElementById("prod-descripcion").value = p.descripcion || "";
         document.getElementById("prod-tipo").value = p.tipo_unidad;
-        document.getElementById("prod-precio-kg").value = parseFloat(p.precio_por_kg || 0);
-        document.getElementById("prod-precio-unidad").value = parseFloat(p.precio_por_unidad || 0);
-        document.getElementById("prod-stock-kg").value = parseFloat(p.stock_kg || 0) || "";
+        document.getElementById("prod-precio").value = parseFloat(p.precio_por_kg || 0);
+        document.getElementById("prod-gramos").value = p.gramos || 1000;
+        document.getElementById("prod-stock").value = parseFloat(p.stock_kg || 0) || "";
+        document.getElementById("prod-precio-unidad").value = parseFloat(p.precio_por_unidad || 0) || "";
         document.getElementById("prod-stock-unidades").value = parseInt(p.stock_unidades || 0) || "";
         document.getElementById("prod-categoria").value = p.categoria_id;
         if (p.imagenes && p.imagenes.length > 0)
@@ -449,15 +464,22 @@
       const data = {
         nombre: document.getElementById("prod-nombre").value.trim(),
         descripcion: document.getElementById("prod-descripcion").value.trim() || null,
-        precio_por_kg: parseFloat(document.getElementById("prod-precio-kg").value) || 0,
         tipo_unidad: document.getElementById("prod-tipo").value,
-        stock_kg: parseFloat(document.getElementById("prod-stock-kg").value) || null,
-        stock_unidades: parseInt(document.getElementById("prod-stock-unidades").value) || null,
         categoria_id: parseInt(document.getElementById("prod-categoria").value),
       };
 
-      if (data.tipo_unidad === "UNIDAD") {
+      if (data.tipo_unidad === "KG") {
+        data.precio_por_kg = parseFloat(document.getElementById("prod-precio").value) || 0;
+        data.gramos = parseInt(document.getElementById("prod-gramos").value) || 1000;
+        data.stock_kg = parseFloat(document.getElementById("prod-stock").value) || null;
+        data.precio_por_unidad = null;
+        data.stock_unidades = null;
+      } else {
         data.precio_por_unidad = parseFloat(document.getElementById("prod-precio-unidad").value) || 0;
+        data.stock_unidades = parseInt(document.getElementById("prod-stock-unidades").value) || null;
+        data.precio_por_kg = 0;
+        data.gramos = 1000;
+        data.stock_kg = null;
       }
 
       try {
