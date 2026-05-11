@@ -12,6 +12,7 @@ class PedidoCreate(BaseModel):
     cliente_nombre: str
     cliente_direccion: str
     cliente_telefono: str
+    cliente_email: str = ""
     direccion_entrega: str | None = None
     tipo_entrega: TipoEntrega
     zona_envio: ZonaEnvio | None = None
@@ -58,6 +59,7 @@ class PedidoResponse(BaseModel):
     cliente_nombre: str
     cliente_direccion: str
     cliente_telefono: str
+    cliente_email: str = ""
     direccion_entrega: str
     tipo_entrega: TipoEntrega
     zona_envio: ZonaEnvio | None = None
