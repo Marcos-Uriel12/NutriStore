@@ -1,0 +1,377 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Carrito — NutriStore</title>
+
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet"
+        integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous" />
+  <link href="/css/style.css" rel="stylesheet" />
+  <script src="https://unpkg.com/htmx.org@2.0.4"></script>
+</head>
+<body>
+
+  <!-- Navbar -->
+  <nav class="navbar navbar-expand-lg sticky-top">
+    <div class="container">
+      <a class="navbar-brand" href="/">NutriStore</a>
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse"
+              data-bs-target="#navbarNav" aria-controls="navbarNav"
+              aria-expanded="false" aria-label="Menú de navegación">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <div class="collapse navbar-collapse" id="navbarNav">
+        <ul class="navbar-nav ms-auto align-items-center">
+          <li class="nav-item"><a class="nav-link" href="/">Inicio</a></li>
+          <li class="nav-item">
+            <a class="nav-link active" href="/carrito.html">
+              Carrito
+              <span id="cart-badge" class="cart-badge" style="display:none">0</span>
+            </a>
+          </li>
+          <li class="nav-item"><a class="nav-link" href="/pedido.html">Mi Pedido</a></li>
+        </ul>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Cart Section -->
+  <div class="container py-5">
+    <h2 class="section-title">Tu Carrito</h2>
+    <div id="cart-content">
+      <div class="text-center py-4">
+        <div class="spinner-border text-success" role="status">
+          <span class="visually-hidden">Cargando carrito...</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Footer -->
+  <footer class="footer">
+    <div class="container">
+      <div class="row">
+        <div class="col-md-4 mb-3 mb-md-0">
+          <h6>Contacto</h6>
+          <p class="mb-1">📍 Av. Siempre Viva 742</p>
+          <p class="mb-1">📞 (011) 4567-8901</p>
+          <p class="mb-0">✉️ hola@nutristore.com.ar</p>
+        </div>
+        <div class="col-md-4 mb-3 mb-md-0">
+          <h6>Horarios</h6>
+          <p class="mb-1">Lunes a Viernes: 9:00 – 20:00</p>
+          <p class="mb-1">Sábados: 9:00 – 14:00</p>
+          <p class="mb-0">Domingos: Cerrado</p>
+        </div>
+        <div class="col-md-4">
+          <h6>Redes</h6>
+          <p class="mb-1"><a href="#" target="_blank" rel="noopener">Instagram</a></p>
+          <p class="mb-1"><a href="#" target="_blank" rel="noopener">Facebook</a></p>
+          <p class="mb-0"><a href="#" target="_blank" rel="noopener">WhatsApp</a></p>
+        </div>
+      </div>
+      <div class="copyright">&copy; 2026 NutriStore — Todos los derechos reservados.</div>
+    </div>
+  </footer>
+
+  <!-- Checkout Modal -->
+  <div class="modal fade" id="checkoutModal" tabindex="-1"
+       aria-labelledby="checkoutModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="checkoutModalLabel">Confirmar Pedido</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+        </div>
+        <form id="checkout-form">
+          <div class="modal-body">
+            <div class="row g-3">
+              <div class="col-md-6">
+                <label for="checkout-nombre" class="form-label">Nombre completo *</label>
+                <input type="text" class="form-control" id="checkout-nombre"
+                       name="nombre" required />
+              </div>
+              <div class="col-md-6">
+                <label for="checkout-telefono" class="form-label">Teléfono *</label>
+                <input type="tel" class="form-control" id="checkout-telefono"
+                       name="telefono" required />
+              </div>
+              <div class="col-12">
+                <label for="checkout-direccion" class="form-label">Dirección *</label>
+                <input type="text" class="form-control" id="checkout-direccion"
+                       name="direccion" required />
+              </div>
+              <div class="col-md-6">
+                <label for="checkout-tipo-entrega" class="form-label">Tipo de entrega *</label>
+                <select class="form-select" id="checkout-tipo-entrega"
+                        name="tipo_entrega" required>
+                  <option value="">Seleccioná...</option>
+                  <option value="ENVIO">Envío a domicilio</option>
+                  <option value="RETIRO">Retiro en local</option>
+                </select>
+              </div>
+              <div class="col-md-6" id="zona-envio-group" style="display:none">
+                <label for="checkout-zona" class="form-label">Zona de envío *</label>
+                <select class="form-select" id="checkout-zona" name="zona_envio">
+                  <option value="">Seleccioná...</option>
+                  <option value="CABA">CABA</option>
+                  <option value="GBA_NORTE">GBA Norte</option>
+                  <option value="GBA_SUR">GBA Sur</option>
+                  <option value="GBA_OESTE">GBA Oeste</option>
+                </select>
+              </div>
+              <div class="col-md-6">
+                <label for="checkout-metodo-pago" class="form-label">Método de pago *</label>
+                <select class="form-select" id="checkout-metodo-pago"
+                        name="metodo_pago" required>
+                  <option value="">Seleccioná...</option>
+                  <option value="EFECTIVO">Efectivo</option>
+                  <option value="TRANSFERENCIA">Transferencia</option>
+                </select>
+              </div>
+            </div>
+            <div id="checkout-error" class="alert alert-danger mt-3 d-none"></div>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+              Cancelar
+            </button>
+            <button type="submit" class="btn btn-primary">Confirmar Pedido</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- Scripts -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
+          integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz"
+          crossorigin="anonymous"></script>
+  <script src="/js/app.js"></script>
+  <script src="/js/cart.js"></script>
+
+  <script>
+    /* ── Render Cart ────────────────────────────────────────────── */
+
+    async function renderCart() {
+      const container = document.getElementById("cart-content");
+
+      let items;
+      try {
+        items = await cart.get();
+      } catch (err) {
+        container.innerHTML = `
+          <div class="alert alert-warning">No se pudo cargar el carrito. Intentá de nuevo.</div>`;
+        return;
+      }
+
+      if (!items || items.length === 0) {
+        container.innerHTML = `
+          <div class="empty-state">
+            <p class="text-muted fs-5 mb-3">Tu carrito está vacío</p>
+            <a href="/" class="btn btn-primary">Ver productos</a>
+          </div>`;
+        updateCartBadge();
+        return;
+      }
+
+      let html = `
+        <div class="table-responsive">
+          <table class="table align-middle">
+            <thead>
+              <tr>
+                <th>Producto</th>
+                <th>Precio</th>
+                <th>Cantidad</th>
+                <th>Subtotal</th>
+                <th></th>
+              </tr>
+            </thead>
+            <tbody>`;
+
+      let total = 0;
+
+      for (const item of items) {
+        const precio = parseFloat(item.precio) || 0;
+        const cantidad = parseFloat(item.cantidad) || 0;
+        const subtotal = cantidad * precio;
+        total += subtotal;
+
+        const imgSrc = item.imagen_url || "";
+        const nombre = item.nombre || `Producto #${item.producto_id}`;
+
+        html += `
+          <tr>
+            <td>
+              <div class="d-flex align-items-center">
+                ${imgSrc ? `<img src="${imgSrc}" width="48" height="48"
+                      class="rounded me-2" style="object-fit:cover" alt="${nombre}" />` : ""}
+                <span>${nombre}</span>
+              </div>
+            </td>
+            <td>$${precio.toFixed(2)}</td>
+            <td>
+              <input type="number"
+                     value="${cantidad}"
+                     min="0.1" step="0.1"
+                     class="form-control form-control-sm"
+                     style="width:85px"
+                     data-producto-id="${item.producto_id}"
+                     onchange="updateQty(this)" />
+            </td>
+            <td><strong>$${subtotal.toFixed(2)}</strong></td>
+            <td>
+              <button class="btn btn-sm btn-danger"
+                      data-producto-id="${item.producto_id}"
+                      onclick="removeItem(this)">
+                &times;
+              </button>
+            </td>
+          </tr>`;
+      }
+
+      html += `
+            </tbody>
+          </table>
+        </div>
+        <div class="d-flex justify-content-between align-items-center mt-3">
+          <h4>Total: <strong>$${total.toFixed(2)}</strong></h4>
+          <button class="btn btn-primary btn-lg"
+                  data-bs-toggle="modal" data-bs-target="#checkoutModal">
+            Confirmar Pedido
+          </button>
+        </div>`;
+
+      container.innerHTML = html;
+      updateCartBadge();
+    }
+
+    /* ── Quantity Update ────────────────────────────────────────── */
+
+    async function updateQty(input) {
+      const productoId = parseInt(input.dataset.productoId, 10);
+      const cantidad = parseFloat(input.value);
+
+      if (isNaN(cantidad) || cantidad <= 0) {
+        // Remove item if quantity is zero or negative
+        try {
+          await cart.remove(productoId);
+        } catch (err) {
+          alert(err.message || "Error al eliminar producto.");
+        }
+        await renderCart();
+        return;
+      }
+
+      try {
+        await cart.update(productoId, cantidad);
+        await renderCart();
+      } catch (err) {
+        alert(err.message || "Error al actualizar cantidad.");
+        await renderCart(); // Re-render to revert
+      }
+    }
+
+    /* ── Remove Item ────────────────────────────────────────────── */
+
+    async function removeItem(btn) {
+      const productoId = parseInt(btn.dataset.productoId, 10);
+      try {
+        await cart.remove(productoId);
+        await renderCart();
+      } catch (err) {
+        alert(err.message || "Error al eliminar producto.");
+      }
+    }
+
+    /* ── Toggle Zona Envío ──────────────────────────────────────── */
+
+    document.addEventListener("DOMContentLoaded", () => {
+      const tipoEntrega = document.getElementById("checkout-tipo-entrega");
+      const zonaGroup = document.getElementById("zona-envio-group");
+      const zonaSelect = document.getElementById("checkout-zona");
+
+      tipoEntrega.addEventListener("change", () => {
+        if (tipoEntrega.value === "ENVIO") {
+          zonaGroup.style.display = "";
+          zonaSelect.required = true;
+        } else {
+          zonaGroup.style.display = "none";
+          zonaSelect.required = false;
+          zonaSelect.value = "";
+        }
+      });
+    });
+
+    /* ── Checkout Submit ────────────────────────────────────────── */
+
+    document.getElementById("checkout-form").addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const form = e.target;
+      const errDiv = document.getElementById("checkout-error");
+      errDiv.classList.add("d-none");
+
+      // Validate cart is not empty
+      let items;
+      try {
+        items = await cart.get();
+      } catch {
+        errDiv.textContent = "No se pudo verificar el carrito.";
+        errDiv.classList.remove("d-none");
+        return;
+      }
+
+      if (!items || items.length === 0) {
+        errDiv.textContent = "Agregá productos al carrito antes de confirmar.";
+        errDiv.classList.remove("d-none");
+        return;
+      }
+
+      const data = {
+        cliente_nombre: form.nombre.value.trim(),
+        cliente_direccion: form.direccion.value.trim(),
+        cliente_telefono: form.telefono.value.trim(),
+        direccion_entrega: form.direccion.value.trim(),
+        tipo_entrega: form.tipo_entrega.value,
+        metodo_pago: form.metodo_pago.value,
+      };
+
+      if (data.tipo_entrega === "ENVIO") {
+        data.zona_envio = form.zona_envio.value;
+      }
+
+      try {
+        const res = await fetch("/pedidos", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            "X-Session-ID": getSessionId(),
+          },
+          body: JSON.stringify(data),
+        });
+
+        if (!res.ok) {
+          const detail = await res.text();
+          throw new Error(detail || "Error al crear el pedido.");
+        }
+
+        const pedido = await res.json();
+        // Close modal
+        const modal = bootstrap.Modal.getInstance(document.getElementById("checkoutModal"));
+        modal.hide();
+        // Redirect to tracking
+        alert(`¡Pedido #${pedido.id} creado! Guardá este número para seguir tu pedido.`);
+        window.location.href = `/pedido.html?id=${pedido.id}`;
+      } catch (err) {
+        errDiv.textContent = err.message || "Error al crear el pedido. Intentá de nuevo.";
+        errDiv.classList.remove("d-none");
+      }
+    });
+
+    /* ── Init ───────────────────────────────────────────────────── */
+
+    document.addEventListener("DOMContentLoaded", renderCart);
+  </script>
+</body>
+</html>
