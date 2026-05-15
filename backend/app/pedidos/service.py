@@ -68,7 +68,9 @@ async def create_pedido(
                 detail=f"Product {pid} not found or inactive",
             )
 
-        # Calculate price
+        # Normalize: use the product's tipo_unidad (cart may have stale data)
+        unidad_medida = producto.tipo_unidad.value
+
         if unidad_medida == "KG":
             precio_unitario = producto.precio_por_kg
         else:

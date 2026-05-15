@@ -165,11 +165,13 @@
       const productoId = parseInt(btn.dataset.productoId, 10);
       if (isNaN(productoId)) return;
 
-      const qty = prompt("Cantidad (kg o unidades):", "1");
+      const tipoUnidad = btn.dataset.tipoUnidad || "KG";
+      const unidadLabel = tipoUnidad === "UNIDAD" ? "unidades" : "kg";
+      const qty = prompt(`Cantidad (${unidadLabel}):`, "1");
       if (!qty || isNaN(qty) || parseFloat(qty) <= 0) return;
 
       try {
-        await cart.add(productoId, parseFloat(qty));
+        await cart.add(productoId, parseFloat(qty), tipoUnidad);
         await updateCartBadge();
         alert("¡Agregado al carrito!");
       } catch (err) {

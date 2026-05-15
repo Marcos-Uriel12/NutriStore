@@ -224,6 +224,7 @@
                      class="form-control form-control-sm"
                      style="width:85px"
                      data-producto-id="${item.producto_id}"
+                     data-unidad-medida="${item.unidad_medida}"
                      onchange="updateQty(this)" />
             </td>
             <td><strong>$${subtotal.toFixed(2)}</strong></td>
@@ -258,6 +259,7 @@
     async function updateQty(input) {
       const productoId = parseInt(input.dataset.productoId, 10);
       const cantidad = parseFloat(input.value);
+      const unidadMedida = input.dataset.unidadMedida || "KG";
 
       if (isNaN(cantidad) || cantidad <= 0) {
         // Remove item if quantity is zero or negative
@@ -271,7 +273,7 @@
       }
 
       try {
-        await cart.update(productoId, cantidad);
+        await cart.update(productoId, cantidad, unidadMedida);
         await renderCart();
       } catch (err) {
         alert(err.message || "Error al actualizar cantidad.");

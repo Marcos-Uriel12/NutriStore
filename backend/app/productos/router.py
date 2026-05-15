@@ -91,6 +91,7 @@ async def productos_page(
                     <button class="btn btn-sm btn-primary add-to-cart"
                             data-producto-id="{prod.id}"
                             data-nombre="{prod.nombre}"
+                            data-tipo-unidad="{prod.tipo_unidad.value}"
                             data-precio="{precio}">
                         Agregar
                     </button>
